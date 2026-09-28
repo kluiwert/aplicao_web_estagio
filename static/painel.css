@@ -1,0 +1,113 @@
+/* ==========================================
+   TEMA CLARO COM NAVBAR ESCURA - PAINEL
+   ========================================== */
+
+body, html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Fundo geral claro, limpo e suave */
+    background: #f8fafc;
+    color: #1e293b;
+}
+
+/* Navbar Superior (Específica em tom escuro) */
+.navbar.bg-dark {
+    background-color: #0f172a !important;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.navbar-brand, .navbar-text {
+    color: #f8fafc !important;
+}
+
+/* Cartões (Containers Laterais e Principais em Branco) */
+.card {
+    background-color: #ffffff !important;
+    border: 1px solid #e2e8f0 !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    color: #1e293b !important;
+}
+
+.card-header {
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+/* Listas da Barra Lateral (Reservas Ativas) */
+.list-group-item {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border-color: #f1f5f9 !important;
+}
+
+.text-muted {
+    color: #64748b !important;
+}
+
+/* Tabela de Equipamentos Disponíveis */
+.table {
+    color: #1e293b !important;
+    margin-bottom: 0;
+}
+
+.table > :not(caption) > * > * {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border-color: #f1f5f9 !important;
+}
+
+.table thead.table-light,
+.table > thead {
+    background-color: #f1f5f9 !important;
+    color: #475569 !important;
+}
+
+.table thead.table-light th {
+    background-color: transparent !important;
+    color: #475569 !important;
+    font-weight: 600;
+}
+
+/* Linha Bloqueada na Tabela (Destaque avermelhado suave para fundo claro) */
+tr.table-danger,
+tr.table-danger td {
+    background-color: #fef2f2 !important;
+    color: #991b1b !important;
+}
+
+/* Barra de Busca e Inputs */
+.form-control, .form-select {
+    background-color: #ffffff !important;
+    border: 1px solid #cbd5e1 !important;
+    color: #1e293b !important;
+}
+
+.form-control::placeholder {
+    color: #94a3b8 !important;
+}
+
+.form-control:focus, .form-select:focus {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 0 0.25rem rgba(2, 132, 199, 0.25);
+}
+
+/* Modais (Janelas Flutuantes) */
+.modal-content {
+    background-color: #ffffff !important;
+    color: #1e293b !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #e2e8f0 !important;
+}
+
+.modal-footer {
+    background-color: #f8fafc !important;
+    border-top: 1px solid #e2e8f0 !important;
+}
+

@@ -1,0 +1,230 @@
+/* ==========================================================================
+   TEMA INTERFACE - SISTEMA DE RESERVAS FEEC (UFAM) - DINÂMICO & SUAVIZADO
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. CONFIGURAÇÃO DE VARIÁVEIS DE COR (DINÂMICA DE TEMAS)
+   -------------------------------------------------------------------------- */
+
+/* TEMA ESCURO PADRÃO */
+:root {
+    --bg-geral: linear-gradient(135deg, #0b151f 0%, #11222f 100%); 
+    --bg-card: rgba(17, 34, 47, 0.75);                             
+    --borda-card: rgba(255, 255, 255, 0.08);                       
+    --texto-titulo: #ffffff;                                       
+    --texto-label: #ffffff;                                        /* CORRIGIDO: Passou para branco puro */
+    --texto-subtitulo: #ffffff;                                    /* CORRIGIDO: Sistema de Reservas em branco puro */
+    --texto-muted: #94a3b8;                                        
+    --bg-input: rgba(255, 255, 255, 0.05);                         
+    --borda-input: rgba(255, 255, 255, 0.925);                      
+    --texto-input: #ffffff;                                        
+    --link-cor: #1ea6f5;                                           /* UNIFICADO: Azul celeste brilhante para todos os links */
+}
+
+/* TEMA CLARO SUAVE (Ativado via JavaScript com a classe .light-theme) */
+body.light-theme {
+    --bg-geral: radial-gradient(circle at top right, #e2e8f0 0%, #f1f5f9 100%); 
+    --bg-card: rgba(248, 250, 252, 0.85); 
+    --borda-card: rgba(15, 23, 42, 0.08);                          
+    --texto-titulo: #0f172a;                                       
+    --texto-label: #334155;                                        /* Tom grafite legível para o modo claro */
+    --texto-subtitulo: #475569;                                    /* Tom cinza elegante para o modo claro */
+    --texto-muted: #64748b;                                        
+    --bg-input: #ffffff;                                           
+    --borda-input: #dde1cb;                                        
+    --texto-input: #0f172a;                                        
+    --link-cor: #0284c7;                                           /* Azul institucional UFAM para o modo claro */
+}
+
+/* --------------------------------------------------------------------------
+   2. ESTRUTURA E ESTILIZAÇÃO DA TELA DE LOGIN (DINÂMICA)
+   -------------------------------------------------------------------------- */
+
+/* Container geral que centraliza o login na tela */
+.login-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 20px;
+    background: var(--bg-geral); 
+    transition: background 0.3s ease;
+}
+
+/* O Cartão de Login que se adapta aos temas */
+.login-card {
+    width: 100% !important;
+    max-width: 420px !important;
+    padding: 2.5rem !important;
+    
+    background-color: var(--bg-card) !important; 
+    backdrop-filter: blur(16px) !important;       
+    -webkit-backdrop-filter: blur(16px) !important;
+    
+    border-radius: 24px !important;
+    border: 1px solid var(--borda-card) !important;
+    box-shadow: 0 20px 40px rgba(168, 162, 162, 0.041) !important;
+    transition: all 0.3s ease; 
+}
+
+/* Títulos principais baseados nas variáveis dinâmicas */
+.login-card h4 {
+    color: var(--texto-titulo) !important;
+    font-weight: 700;
+}
+
+/* Subtítulo: Sistema de Reservas - FEEC */
+.login-card p.text-muted.mb-0 {
+    color: var(--texto-subtitulo) !important; /* Aplica a nova variável branca no modo escuro */
+}
+
+/* Labels de digitação: Matrícula e Senha */
+.login-card .form-label {
+    color: var(--texto-label) !important; /* Aplica a nova variável branca no modo escuro */
+    font-weight: 500;
+}
+
+/* Outros textos pequenos (como o "Ainda não tem acesso?") */
+.login-card p.small.text-muted.mb-0 {
+    color: var(--texto-muted) !important;
+}
+
+/* Texto do "Lembrar-me" */
+.login-card .form-check-label {
+    color: var(--texto-muted) !important;
+}
+
+/* Campos de digitação (Inputs) */
+.login-card .form-control {
+    background-color: var(--bg-input) !important;
+    border: 1px solid var(--borda-input) !important;
+    color: var(--texto-input) !important;
+    border-radius: 10px !important;
+    transition: all 0.2s ease;
+}
+
+.login-card .form-control::placeholder {
+    color: var(--texto-muted) !important;
+    opacity: 0.7;
+}
+
+.login-card .form-control:focus {
+    background-color: var(--bg-input) !important;
+    border-color: #0284c7 !important;
+    box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.2) !important;
+}
+
+/* Links customizados unificados (Esqueci a senha / Cadastre-se) */
+.link-custom, .login-card a.link-custom {
+    color: var(--link-cor) !important; /* Força ambos a usarem exatamente a mesma cor dinâmica */
+    font-weight: 600 !important;
+    transition: color 0.2s ease;
+}
+
+.link-custom:hover {
+    text-decoration: underline !important;
+    opacity: 0.9;
+}
+
+/* Botão ENTRAR */
+.login-card .btn-primary {
+    background-color: #0284c7 !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.75rem !important;
+    color: #ffffff !important;
+    transition: background-color 0.2s ease;
+}
+
+.login-card .btn-primary:hover {
+    background-color: #0369a1 !important;
+}
+
+
+/* --------------------------------------------------------------------------
+   3. BOTÕES AUXILIARES FLUTUANTES
+   -------------------------------------------------------------------------- */
+
+/* Botão de Acesso Restrito Administrativo */
+.btn-admin {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(15, 23, 42, 0.6); /* Fundo escuro translúcido para contraste */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ffffff !important;
+    padding: 8px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.875rem;
+    font-weight: 500;
+    backdrop-filter: blur(4px);
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+/* Altera o botão de admin no modo claro para manter boa leitura */
+body.light-theme .btn-admin {
+    background-color: rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(15, 23, 42, 0.1);
+    color: #0f172a !important;
+}
+
+/* Botão Flutuante de Alternar Tema (CORRIGIDO) */
+.btn-theme-toggle {
+    position: fixed;                /* Fixa o botão no canto da janela */
+    bottom: 20px;                   /* Distância da borda inferior */
+    right: 20px;                    /* Distância da borda direita */
+    width: 46px;                    /* Largura ideal para o círculo */
+    height: 46px;                   /* Altura idêntica à largura */
+    border-radius: 50%;             /* Força o formato perfeitamente redondo */
+    
+    /* Cores estáticas para o botão não sumir ou mudar de forma errada */
+    background-color: #11222f !important; /* Mantém o fundo azul-petróleo escuro corporativo */
+    color: #ffffff !important;            /* Garante o emoji (sol/lua) com cor natural e visível */
+    border: 1px solid rgba(255, 255, 255, 0.15) !important; /* Linha de borda fina elegante */
+    
+    font-size: 1.25rem;             /* Tamanho do emoji */
+    cursor: pointer;                /* Cursor de clique ativo */
+    
+    /* Flexbox crucial para alinhar o sol exatamente no meio do círculo */
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3); /* Sombra suave de flutuação */
+    z-index: 100;                   /* Garante que fique acima de todas as camadas */
+    transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); /* Animação de clique fluida */
+}
+
+/* Efeito de aproximação ao passar o mouse */
+.btn-theme-toggle:hover {
+    transform: scale(1.08);         /* Expande levemente o círculo */
+    border-color: #0284c7 !important; /* Aceso sutil com o azul do laboratório */
+}
+
+/* Garante o visual limpo do botão mesmo se o tema claro estiver ativo */
+body.light-theme .btn-theme-toggle {
+    background-color: #1e293b !important; /* Tom grafite escuro confortável no modo claro */
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.15);
+}
+
+
+/* --------------------------------------------------------------------------
+   4. CORREÇÃO PARA AS OPÇÕES DO SELECT (VÍNCULO UFAM)
+   -------------------------------------------------------------------------- */
+
+/* Modo Escuro (Padrão): Fundo escuro e texto claro para as opções */
+.form-control option,
+.form-select option {
+    background-color: #0b151f !important;
+    color: #ffffff !important;
+}
+
+/* Modo Claro: Fundo branco e texto escuro para as opções */
+body.light-theme .form-control option,
+body.light-theme .form-select option {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+}

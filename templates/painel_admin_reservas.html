@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<!--
+    ============================================================
+    TELA: Reservas Pendentes (Visão do Administrador) - FEEC
+    ============================================================
+    O QUE ESTA TELA ENTREGA VISUALMENTE:
+    Painel de controlo para a equipa técnica e professores gerirem
+    as solicitações de empréstimo de equipamentos feitas pelos alunos.
+    
+    Estrutura:
+      - Navbar Admin: Identificação visual em modo escuro com badge vermelho.
+      - Cartão de Filtros: Opções rápidas para pesquisar alunos ou filtrar 
+        por data (visual/estético por enquanto).
+      - Tabela de Solicitações: Lista central detalhada contendo:
+        * Dados do Aluno (Nome, Vínculo e Matrícula)
+        * Equipamento solicitado e Código de Património
+        * Período da reserva (Retirada e Devolução)
+        * Botões de Ação rápida (Aprovar em verde / Recusar em vermelho).
+    ============================================================
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprovação de Reservas - Admin FEEC</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; }
+        .navbar-admin { background-color: #1e293b; }
+        .table-hover tbody tr:hover { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+    <!-- Barra de Navegação do Administrador -->
+    <nav class="navbar navbar-dark navbar-admin shadow-sm mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 d-flex align-items-center">
+                <span class="badge bg-danger me-2">ADMIN</span> 
+                Gestão de Reservas
+            </span>
+            <div class="d-flex">
+                <a href="/painel-admin" class="btn btn-outline-light btn-sm me-2">← Voltar ao Menu</a>
+                <a href="/" class="btn btn-outline-light btn-sm">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- Cabeçalho da Página -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="fw-bold text-dark">Solicitações Pendentes</h3>
+                <p class="text-muted">Analise e aprove os pedidos de equipamentos para os projetos e aulas práticas.</p>
+            </div>
+        </div>
+
+        <!-- Tabela de Solicitações -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white p-3 border-bottom-0">
+                <h6 class="fw-bold text-secondary mb-0">A aguardar análise (2)</h6>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Solicitante</th>
+                            <th>Equipamento</th>
+                            <th>Período</th>
+                            <th class="text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Solicitação 1 -->
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">João Silva</strong><br>
+                                <small class="text-muted">Matrícula: 21900123 | Graduação</small>
+                            </td>
+                            <td>
+                                <strong>Osciloscópio Tektronix TBS1052B</strong><br>
+                                <small class="text-secondary">Património: EE-LAB-014</small>
+                            </td>
+                            <td>
+                                <span class="d-block small text-muted">Retirada: <strong>Hoje, 14:00</strong></span>
+                                <span class="d-block small text-muted">Devolução: <strong>26/09/2026, 17:00</strong></span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-danger fw-bold px-3">Recusar</button>
+                                    <button class="btn btn-sm btn-success fw-bold px-3">Aprovar</button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <!-- Solicitação 2 -->
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">Maria Fernandes</strong><br>
+                                <small class="text-muted">Matrícula: 22100456 | Mestrado</small>
+                            </td>
+                            <td>
+                                <strong>Estação de Solda Hikari</strong><br>
+                                <small class="text-secondary">Património: EE-LAB-105</small>
+                            </td>
+                            <td>
+                                <span class="d-block small text-muted">Retirada: <strong>26/09/2026, 08:00</strong></span>
+                                <span class="d-block small text-muted">Devolução: <strong>30/09/2026, 12:00</strong></span>
+                            </td>
+                            <td class="text-center">
+                                <div class="d-flex justify-content-center gap-2">
+                                    <button class="btn btn-sm btn-outline-danger fw-bold px-3">Recusar</button>
+                                    <button class="btn btn-sm btn-success fw-bold px-3">Aprovar</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer bg-light p-3 text-center border-0">
+                <small class="text-muted">Não há mais solicitações pendentes para hoje.</small>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

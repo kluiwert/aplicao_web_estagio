@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<!--
+    ============================================================
+    TELA: Painel do Administrador - Reserva FEEC
+    ============================================================
+    O QUE ESTA TELA ENTREGA VISUALMENTE:
+    O "menu principal" da área administrativa: uma navbar escura no
+    topo (com selo "ADMIN", saudação "Olá, Admin" e botão de Sair) e,
+    abaixo, um título "Visão Geral" seguido de três cartões lado a
+    lado, cada um representando um módulo de gestão:
+      1) Gerenciar Equipamentos — leva ao cadastro de materiais
+      2) Reservas Pendentes — aprovar/recusar solicitações de alunos
+      3) Controle de Alunos — visualizar cadastros e bloqueios
+    Cada cartão tem um ícone grande, um título, uma breve descrição
+    e um botão de acesso. Ao passar o mouse, o cartão "sobe" levemente
+    e ganha uma sombra (efeito hover definido no CSS).
+    ============================================================
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Admin - FEEC</title>
+
+    <!-- Framework de estilos base (grid, botões, cartões prontos) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Estilos específicos desta tela -->
+    <style>
+        body { background-color: #f4f6f9; }               /* fundo neutro do painel */
+        .navbar-admin { background-color: #1e293b; }       /* navbar escura, mesma paleta "Tech" */
+
+        /* Efeito de destaque ao passar o mouse sobre os cartões de módulo:
+           sobe levemente (translateY) e ganha uma sombra mais forte */
+        .card-menu { transition: transform 0.2s; cursor: pointer; }
+        .card-menu:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+         NAVBAR ADMINISTRATIVA
+         Fixa no topo, com selo "ADMIN", nome do laboratório,
+         saudação ao administrador logado e botão de sair
+         ============================================================ -->
+    <nav class="navbar navbar-dark navbar-admin shadow-sm mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 d-flex align-items-center">
+                <span class="badge bg-danger me-2">ADMIN</span>
+                Laboratório de Controle e Energia
+            </span>
+            <div class="d-flex">
+                <!-- "Olá, Admin" é texto fixo por enquanto;
+                     futuramente pode ser substituído pelo nome real do admin logado (ex: via template Flask/Jinja) -->
+                <span class="navbar-text me-3 text-light">Olá, Admin</span>
+                <a href="/" class="btn btn-outline-light btn-sm">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <!-- Título e instrução da página -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <h3 class="fw-bold text-dark">Visão Geral</h3>
+                <p class="text-muted">Selecione o módulo que deseja gerenciar.</p>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             GRADE DE MÓDULOS ADMINISTRATIVOS (3 colunas em telas médias+)
+             ============================================================ -->
+        <div class="row">
+
+            <!-- ---------- Módulo 1: Equipamentos ---------- -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body text-center p-4">
+                        <h1 class="display-4 mb-3">🛠️</h1>
+                        <h5 class="fw-bold">Gerenciar Equipamentos</h5>
+                        <p class="text-muted small">Adicionar, editar ou remover itens do inventário do laboratório.</p>
+                        <!-- Link funcional: leva para a tela de cadastro de materiais -->
+                        <a href="/painel-admin/cadastro-materiais" class="btn btn-primary w-100 mt-2">Acessar Inventário</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------- Módulo 2: Aprovar Reservas ----------
+                 CORREÇÃO: era um <button> sem nenhuma ação (sem onclick,
+                 sem form, sem link) — clicar nele não fazia nada. Trocado
+                 por <a> com href de exemplo, seguindo o padrão do Módulo 1.
+                 Ajuste o caminho para a rota real quando essa tela existir. -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body text-center p-4">
+                        <h1 class="display-4 mb-3">📅</h1>
+                        <h5 class="fw-bold">Reservas Pendentes</h5>
+                        <p class="text-muted small">Aprovar ou recusar solicitações de empréstimos dos alunos.</p>
+                        <a href="/painel-admin/reservas-pendentes" class="btn btn-warning w-100 mt-2 text-dark fw-bold">Ver Solicitações</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ---------- Módulo 3: Usuários ----------
+                 CORREÇÃO: mesmo caso do Módulo 2 — <button> sem ação nenhuma.
+                 Trocado por <a> com href de exemplo. -->
+            <div class="col-md-4 mb-3">
+                <div class="card border-0 shadow-sm h-100 card-menu">
+                    <div class="card-body text-center p-4">
+                        <h1 class="display-4 mb-3">👥</h1>
+                        <h5 class="fw-bold">Controle de Alunos</h5>
+                        <p class="text-muted small">Visualizar cadastros, aplicar bloqueios ou limpar pendências.</p>
+                        <a href="/painel-admin/controle-alunos" class="btn btn-secondary w-100 mt-2">Gerenciar Acessos</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<!--
+    ============================================================
+    TELA: Cadastro de Materiais - Admin FEEC
+    ============================================================
+    O QUE ESTA TELA ENTREGA VISUALMENTE:
+    Um painel administrativo (fundo cinza claro, navbar escura no
+    topo) com um cartão de formulário destacado por uma borda azul
+    no topo. O formulário permite ao administrador cadastrar um
+    novo equipamento/material do laboratório, com:
+      - Nome do equipamento e código de patrimônio
+      - Quantidade total, categoria (medição/ferramentas/
+        consumível/outros) e estado inicial (disponível/manutenção)
+      - Campo de observações/acessórios (opcional)
+      - Botões "Limpar Campos" e "Salvar Equipamento"
+    A navbar do topo mostra o selo "ADMIN", o título "Gestão de
+    Inventário" e atalhos para voltar ao menu administrativo ou sair.
+    ============================================================
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Materiais - Admin FEEC</title>
+
+    <!-- Framework de estilos base (grid, botões, cartões prontos) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Estilos específicos desta tela (não reaproveita login.css,
+         pois aqui o layout é de painel administrativo, não de cartão de login) -->
+    <style>
+        body { background-color: #f4f6f9; }               /* fundo neutro do painel */
+        .navbar-admin { background-color: #1e293b; }       /* navbar escura, mesma paleta "Tech" */
+        .card-form { border-top: 4px solid #0284c7; }      /* faixa azul de destaque no topo do card */
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+         NAVBAR ADMINISTRATIVA
+         Fixa no topo, com selo "ADMIN", título da seção e atalhos
+         de navegação (voltar ao menu / sair do painel)
+         ============================================================ -->
+    <nav class="navbar navbar-dark navbar-admin shadow-sm mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 d-flex align-items-center">
+                <span class="badge bg-danger me-2">ADMIN</span>
+                Gestão de Inventário
+            </span>
+            <div class="d-flex">
+                <a href="/painel-admin" class="btn btn-outline-light btn-sm me-2">← Voltar ao Menu</a>
+                <a href="/" class="btn btn-outline-light btn-sm">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ============================================================
+         CARTÃO DO FORMULÁRIO DE CADASTRO
+         Centralizado em uma coluna larga (col-lg-8) dentro do container
+         ============================================================ -->
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+
+                <div class="card border-0 shadow-sm card-form">
+
+                    <!-- Cabeçalho do cartão: título e instrução breve -->
+                    <div class="card-header bg-white pt-4 pb-2 border-0">
+                        <h4 class="fw-bold text-dark mb-0">Cadastrar Novo Equipamento</h4>
+                        <p class="text-muted small">Adicione os detalhes do material para disponibilizá-lo para reserva.</p>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Formulário enviado via POST para a rota /painel-admin/cadastro-materiais no backend (Flask) -->
+                        <form action="/painel-admin/cadastro-materiais" method="POST">
+
+                            <!-- ---------- Linha 1: Nome do equipamento e código de patrimônio ---------- -->
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <label for="nome_equipamento" class="form-label fw-semibold text-secondary small">Nome do Equipamento/Material</label>
+                                    <input type="text" class="form-control" id="nome_equipamento" name="nome_equipamento" placeholder="Ex: Multímetro Digital Fluke 87V" required>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="patrimonio" class="form-label fw-semibold text-secondary small">Cód. Patrimônio</label>
+                                    <input type="text" class="form-control" id="patrimonio" name="patrimonio" placeholder="Ex: EE-LAB-022" required>
+                                </div>
+                            </div>
+
+                            <!-- ---------- Linha 2: Quantidade, categoria e estado inicial ---------- -->
+                            <div class="row mb-4">
+                                <div class="col-md-3">
+                                    <label for="quantidade" class="form-label fw-semibold text-secondary small">Quantidade Total</label>
+                                    <input type="number" class="form-control" id="quantidade" name="quantidade" min="1" value="1" required>
+                                </div>
+                                <div class="col-md-5">
+                                    <label for="categoria" class="form-label fw-semibold text-secondary small">Categoria</label>
+                                    <select class="form-select" id="categoria" name="categoria" required>
+                                        <option value="">Selecione...</option>
+                                        <option value="medicao">Equipamento de Medição</option>
+                                        <option value="ferramentas">Ferramentas Manuais</option>
+                                        <option value="consumivel">Componente Consumível</option>
+                                        <option value="outros">Outros</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="status" class="form-label fw-semibold text-secondary small">Estado Inicial</label>
+                                    <select class="form-select" id="status" name="status" required>
+                                        <option value="disponivel">Disponível para Reserva</option>
+                                        <option value="manutencao">Em Manutenção</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- ---------- Linha 3: Observações/acessórios (campo opcional, sem "required") ---------- -->
+                            <div class="mb-4">
+                                <label for="observacoes" class="form-label fw-semibold text-secondary small">Observações / Acessórios Incluídos</label>
+                                <textarea class="form-control" id="observacoes" name="observacoes" rows="2" placeholder="Ex: Acompanha pontas de prova vermelha e preta..."></textarea>
+                            </div>
+
+                            <!-- ---------- Botões de ação ----------
+                                 "reset" limpa o formulário sem enviar nada ao servidor;
+                                 "submit" envia os dados para a rota definida no <form> -->
+                            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                                <button type="reset" class="btn btn-light border fw-bold text-secondary">Limpar Campos</button>
+                                <button type="submit" class="btn btn-primary fw-bold px-4">Salvar Equipamento</button>
+                            </div>
+
+                        </form>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

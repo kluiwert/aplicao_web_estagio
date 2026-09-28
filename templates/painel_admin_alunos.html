@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<!--
+    ============================================================
+    TELA: Controle de Alunos (Visão do Administrador) - Reserva FEEC
+    ============================================================
+    O QUE ESTA TELA ENTREGA VISUALMENTE:
+    O painel de gestão de utilizadores do laboratório. Permite ao 
+    administrador (professor/técnico) visualizar quem tem acesso ao 
+    sistema e aplicar penalidades caso necessário.
+
+    Estrutura:
+      1) Navbar Administrativa (padrão escuro, selo ADMIN).
+      2) Cabeçalho com título e barra de pesquisa rápida por matrícula.
+      3) Tabela de Usuários listando:
+         - Nome e E-mail de contato.
+         - Matrícula e Vínculo (Graduação, Pós, etc.).
+         - Status Atual (Ativo em verde ou Bloqueado em vermelho).
+         - Ações (Botões para bloquear/desbloquear ou ver histórico).
+    ============================================================
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Alunos - Admin FEEC</title>
+
+    <!-- Framework de estilos base -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Estilos específicos desta tela -->
+    <style>
+        body { background-color: #f4f6f9; }
+        .navbar-admin { background-color: #1e293b; }
+        
+        /* Efeito hover sutil nas linhas da tabela para facilitar a leitura */
+        .table-hover tbody tr:hover { background-color: #f8fafc; }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+         NAVBAR ADMINISTRATIVA
+         ============================================================ -->
+    <nav class="navbar navbar-dark navbar-admin shadow-sm mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 d-flex align-items-center">
+                <span class="badge bg-danger me-2">ADMIN</span> 
+                Gestão de Usuários
+            </span>
+            <div class="d-flex">
+                <!-- Retorna ao menu principal administrativo -->
+                <a href="/painel-admin" class="btn btn-outline-light btn-sm me-2">← Voltar ao Menu</a>
+                <a href="/" class="btn btn-outline-light btn-sm">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- ============================================================
+             CABEÇALHO E FILTRO DE PESQUISA
+             ============================================================ -->
+        <div class="row align-items-center mb-4">
+            <div class="col-md-7">
+                <h3 class="fw-bold text-dark mb-0">Controle de Acessos</h3>
+                <p class="text-muted mb-0">Gerencie permissões e penalidades dos usuários cadastrados.</p>
+            </div>
+            <div class="col-md-5 mt-3 mt-md-0">
+                <div class="input-group shadow-sm">
+                    <input type="text" class="form-control border-0" placeholder="Buscar por nome ou matrícula...">
+                    <button class="btn btn-secondary" type="button">Buscar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ============================================================
+             TABELA DE USUÁRIOS
+             ============================================================ -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Usuário</th>
+                            <th>Vínculo</th>
+                            <th>Status da Conta</th>
+                            <th class="text-end pe-4">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- ---------- Aluno 1: Regular/Ativo ---------- -->
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">João Silva</strong><br>
+                                <small class="text-muted">joao.silva@ufam.edu.br</small>
+                            </td>
+                            <td>
+                                <strong>21900123</strong><br>
+                                <small class="text-secondary">Graduação</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">Acesso Liberado</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-outline-secondary me-1">Histórico</button>
+                                <button class="btn btn-sm btn-outline-danger">Bloquear</button>
+                            </td>
+                        </tr>
+
+                        <!-- ---------- Aluno 2: Inadimplente/Bloqueado ---------- -->
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">Lucas Mendes</strong><br>
+                                <small class="text-muted">lucas.mendes@ufam.edu.br</small>
+                            </td>
+                            <td>
+                                <strong>21800555</strong><br>
+                                <small class="text-secondary">Graduação</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-danger">Bloqueado (Atraso)</span><br>
+                                <small class="text-danger" style="font-size: 0.7rem;">Multímetro Fluke 87V</small>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-outline-secondary me-1">Histórico</button>
+                                <button class="btn btn-sm btn-success">Desbloquear</button>
+                            </td>
+                        </tr>
+
+                        <!-- ---------- Aluno 3: Pós-Graduação ---------- -->
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">Maria Fernandes</strong><br>
+                                <small class="text-muted">maria.f@ufam.edu.br</small>
+                            </td>
+                            <td>
+                                <strong>22100456</strong><br>
+                                <small class="text-secondary">Pós/Mestrado</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-success">Acesso Liberado</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-outline-secondary me-1">Histórico</button>
+                                <button class="btn btn-sm btn-outline-danger">Bloquear</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer bg-white p-3 border-0 text-center">
+                <small class="text-muted">Mostrando 3 usuários recentes.</small>
+            </div>
+        </div>
+        
+    </div>
+
+</body>
+</html>
