@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<!--
+    ============================================================
+    TELA: Balcão de Atendimento (Visão do Estagiário) - FEEC/UFAM
+    ============================================================
+-->
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Balcão de Atendimento - Estagiário FEEC</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        body { background-color: #f4f6f9; }
+        .navbar-estagiario { background-color: #0f172a; border-bottom: 3px solid #38bdf8; }
+        .table-hover tbody tr:hover { background-color: #f8fafc; }
+
+        /* Efeito visual de destaque ao passar o mouse sobre os KPIs */
+        .card-kpi {
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+        }
+        .card-kpi:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+        }
+
+        .foto-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: .5rem;
+            background: #f8fafc;
+            min-height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .foto-preview { max-width: 100%; max-height: 200px; object-fit: contain; }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR DO ESTAGIÁRIO -->
+    <nav class="navbar navbar-dark navbar-estagiario shadow-sm mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 d-flex align-items-center">
+                <span class="badge bg-info text-dark me-2 font-monospace">ESTAGIÁRIO</span> 
+                Balcão de Atendimento FEEC
+            </span>
+            <div class="d-flex">
+                <a href="/" class="btn btn-outline-light btn-sm">Sair</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        <!-- ============================================================
+             PAINEL DE KPIS / RESUMO DO DIA (CLICÁVEIS E INTERATIVOS)
+             ============================================================ -->
+        <div class="row g-3 mb-4">
+            <!-- Cartão 1: Retiradas Hoje -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-white card-kpi" data-bs-toggle="modal" data-bs-target="#modalKpiDetalhes" data-tipo="retiradas">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3 text-primary">
+                            <i class="bi bi-box-arrow-up-right fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0 small text-uppercase fw-bold">Retiradas Hoje</h6>
+                            <h3 class="fw-bold mb-0 text-dark">4 <small class="text-muted fs-6 fw-normal">(Ver lista)</small></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartão 2: Devoluções Esperadas -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-white card-kpi" data-bs-toggle="modal" data-bs-target="#modalKpiDetalhes" data-tipo="devolucoes">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3 text-success">
+                            <i class="bi bi-box-arrow-in-down-left fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0 small text-uppercase fw-bold">Devoluções Esperadas</h6>
+                            <h3 class="fw-bold mb-0 text-dark">2 <small class="text-muted fs-6 fw-normal">(Ver lista)</small></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cartão 3: Pendências em Atraso -->
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm bg-white card-kpi" data-bs-toggle="modal" data-bs-target="#modalKpiDetalhes" data-tipo="atrasos">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="rounded-circle bg-danger bg-opacity-10 p-3 me-3 text-danger">
+                            <i class="bi bi-exclamation-triangle fs-3"></i>
+                        </div>
+                        <div>
+                            <h6 class="text-muted mb-0 small text-uppercase fw-bold">Pendências em Atraso</h6>
+                            <h3 class="fw-bold mb-0 text-danger">1 <small class="text-muted fs-6 fw-normal">(Ver lista)</small></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- BARRA DE ATENDIMENTO RÁPIDO -->
+        <div class="row align-items-center mb-4">
+            <div class="col-md-6">
+                <h4 class="fw-bold text-dark mb-0">Fila do Balcão</h4>
+                <p class="text-muted mb-0 small">Localize o aluno por nome ou matrícula para registrar a saída/entrada.</p>
+            </div>
+            <div class="col-md-6 mt-3 mt-md-0">
+                <div class="input-group shadow-sm">
+                    <span class="input-group-text bg-white border-0 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="inputBusca" class="form-control border-0" placeholder="Digite a matrícula ou nome do aluno no balcão...">
+                    <button class="btn btn-primary fw-bold" id="btnBusca" type="button">Buscar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELA DE ATENDIMENTOS DO DIA -->
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Aluno no Balcão</th>
+                            <th>Equipamento Solicitado</th>
+                            <th>Operação</th>
+                            <th class="text-end pe-4">Ação na Bancada</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaAtendimentos">
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">João Silva</strong><br>
+                                <small class="text-muted">Matrícula: 21900123</small>
+                            </td>
+                            <td>
+                                <strong>Osciloscópio Tektronix TBS1052B</strong><br>
+                                <small class="text-secondary">EE-LAB-014</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-primary"><i class="bi bi-box-arrow-up-right me-1"></i> Retirada Pendente</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-primary fw-bold btn-atender" data-acao="saida" data-aluno="João Silva" data-equipamento="Osciloscópio Tektronix TBS1052B">
+                                    <i class="bi bi-camera me-1"></i> Registrar Saída
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">Maria Fernandes</strong><br>
+                                <small class="text-muted">Matrícula: 22100456</small>
+                            </td>
+                            <td>
+                                <strong>Multímetro Fluke 87V</strong><br>
+                                <small class="text-secondary">EE-LAB-022</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-success"><i class="bi bi-box-arrow-in-down-left me-1"></i> Devolução Esperada</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-success fw-bold btn-atender" data-acao="retorno" data-aluno="Maria Fernandes" data-equipamento="Multímetro Fluke 87V">
+                                    <i class="bi bi-camera me-1"></i> Registrar Devolução
+                                </button>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">Lucas Mendes</strong><br>
+                                <small class="text-muted">Matrícula: 21800555</small>
+                            </td>
+                            <td>
+                                <strong>Fonte de Bancada Minipa</strong><br>
+                                <small class="text-secondary">EE-LAB-009</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-danger"><i class="bi bi-exclamation-octagon me-1"></i> Atrasado</span>
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-warning text-dark fw-bold btn-atender" data-acao="retorno" data-aluno="Lucas Mendes" data-equipamento="Fonte de Bancada Minipa">
+                                    <i class="bi bi-box-arrow-in-down-left me-1"></i> Receber Atrasado
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer bg-white p-3 border-0 text-center">
+                <small class="text-muted">Fila de atendimento atualizada em tempo real.</small>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         MODAL DETALHADO DOS KPIS (POP-UP VISUAL COM NOMES E EQUIPAMENTOS)
+         ============================================================ -->
+    <div class="modal fade" id="modalKpiDetalhes" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="kpiModalTitulo"><i class="bi bi-info-circle me-2"></i> Detalhes</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="text-muted small mb-3" id="kpiModalSubtitulo">Listagem completa:</p>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 border">
+                            <thead class="table-light">
+                                <tr>
+                                    <th class="ps-3">Aluno / Matrícula</th>
+                                    <th>Equipamento & Patrimônio</th>
+                                    <th class="text-end pe-3">Status / Horário</th>
+                                </tr>
+                            </thead>
+                            <tbody id="kpiModalTabelaCorpo">
+                                <!-- Preenchido dinamicamente via JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-secondary btn-sm px-4 fw-bold" data-bs-dismiss="modal">Fechar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE REGISTRO RÁPIDO DO ESTAGIÁRIO -->
+    <div class="modal fade" id="modalAtendimentoEstagiario" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header bg-dark text-white">
+                    <h5 class="modal-title fw-bold" id="modalTituloAtendimento">
+                        <i class="bi bi-journal-text me-2"></i> Registro de Atendimento
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                
+                <form id="formAtendimentoEstagiario" action="/estagiario/atendimento" method="POST" enctype="multipart/form-data">
+                    <div class="modal-body">
+                        <input type="hidden" id="inputAluno" name="aluno">
+                        <input type="hidden" id="inputEquipamento" name="equipamento">
+
+                        <div class="alert alert-secondary mb-3 py-2">
+                            <div class="row text-dark small">
+                                <div class="col-6"><strong>Aluno:</strong> <span id="labelAluno">---</span></div>
+                                <div class="col-6"><strong>Equipamento:</strong> <span id="labelEquipamento">---</span></div>
+                            </div>
+                        </div>
+
+                        <div class="mb-3" data-foto-upload data-max-mb="5">
+                            <label class="form-label fw-bold text-secondary small" id="labelFotoTitulo">Foto da Inspeção</label>
+                            
+                            <div class="foto-box">
+                                <img class="foto-preview d-none" alt="Pré-visualização">
+                                <div class="foto-placeholder text-muted small text-center p-3">
+                                    <i class="bi bi-cloud-arrow-up fs-2 d-block mb-1"></i>
+                                    Arraste a foto ou clique aqui para selecionar
+                                </div>
+                            </div>
+
+                            <input type="file" class="form-control mt-2 foto-input d-none" id="fotoInspecao" name="foto" accept="image/*" required>
+                            
+                            <div class="d-flex align-items-center gap-2 mt-2">
+                                <button type="button" class="btn btn-outline-danger btn-sm foto-remover d-none">Remover foto</button>
+                                <span class="text-danger small foto-erro" role="alert"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="obsInspecao" class="form-label fw-bold text-secondary small">Observações de Estado / Acessórios</label>
+                            <textarea class="form-control" id="obsInspecao" name="observacoes" rows="2" placeholder="Ex: Cabos conferidos, sem avarias visíveis..." required></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer bg-light">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="submit" class="btn btn-primary fw-bold" id="btnSalvarAtendimento">Confirmar Registro</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+
+            // DADOS VISUAIS DETALHADOS PARA OS POP-UPS DOS CARTÕES (KPIS)
+            const dadosKpi = {
+                retiradas: [
+                    { nome: "João Silva", matricula: "21900123", equipamento: "Osciloscópio Tektronix TBS1052B", patrimonio: "EE-LAB-014", status: "Retirada às 14:00", badge: "bg-primary" },
+                    { nome: "Carlos Souza", matricula: "22000789", equipamento: "Gerador de Sinais Minipa", patrimonio: "EE-LAB-055", status: "Retirada às 14:30", badge: "bg-primary" },
+                    { nome: "Ana Paula", matricula: "22200111", equipamento: "Fonte de Bancada Digital", patrimonio: "EE-LAB-033", status: "Retirada às 15:00", badge: "bg-primary" },
+                    { nome: "Pedro Santos", matricula: "21900999", equipamento: "Multímetro Digital Fluke", patrimonio: "EE-LAB-088", status: "Retirada às 16:00", badge: "bg-primary" }
+                ],
+                devolucoes: [
+                    { nome: "Maria Fernandes", matricula: "22100456", equipamento: "Multímetro Fluke 87V", patrimonio: "EE-LAB-022", status: "Prazo até 12:00", badge: "bg-success" },
+                    { nome: "Juliana Costa", matricula: "22000321", equipamento: "Placa FPGA Basys 3", patrimonio: "EE-LAB-045", status: "Prazo até 17:00", badge: "bg-success" }
+                ],
+                atrasos: [
+                    { nome: "Lucas Mendes", matricula: "21800555", equipamento: "Fonte de Bancada Minipa", patrimonio: "EE-LAB-009", status: "Atrasado (Devolução era 23/09)", badge: "bg-danger" }
+                ]
+            };
+
+            // Preenchimento dinâmico do modal ao clicar nos cartões superiores
+            const modalKpi = document.getElementById('modalKpiDetalhes');
+            modalKpi.addEventListener('show.bs.modal', function (event) {
+                const card = event.relatedTarget;
+                const tipo = card.getAttribute('data-tipo');
+                
+                const tituloEl = document.getElementById('kpiModalTitulo');
+                const subtituloEl = document.getElementById('kpiModalSubtitulo');
+                const corpoTabela = document.getElementById('kpiModalTabelaCorpo');
+
+                corpoTabela.innerHTML = '';
+
+                if (tipo === 'retiradas') {
+                    tituloEl.innerHTML = `<i class="bi bi-box-arrow-up-right me-2 text-primary"></i> Retiradas Agendadas para Hoje`;
+                    subtituloEl.textContent = "Lista completa de alunos com retirada prevista para este turno:";
+                } else if (tipo === 'devolucoes') {
+                    tituloEl.innerHTML = `<i class="bi bi-box-arrow-in-down-left me-2 text-success"></i> Devoluções Esperadas para Hoje`;
+                    subtituloEl.textContent = "Equipamentos previstos para retorno ao balcão:";
+                } else if (tipo === 'atrasos') {
+                    tituloEl.innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2 text-danger"></i> Usuários com Pendências em Atraso`;
+                    subtituloEl.textContent = "Atenção: Os usuários abaixo possuem equipamentos vencidos e estão bloqueados:";
+                }
+
+                const lista = dadosKpi[tipo] || [];
+                if (lista.length === 0) {
+                    corpoTabela.innerHTML = `<tr><td colspan="3" class="text-center text-muted py-4">Nenhum registro encontrado nesta categoria.</td></tr>`;
+                } else {
+                    lista.forEach(item => {
+                        const tr = document.createElement('tr');
+                        tr.innerHTML = `
+                            <td class="ps-3">
+                                <strong class="text-dark">${item.nome}</strong><br>
+                                <small class="text-muted">Matrícula: ${item.matricula}</small>
+                            </td>
+                            <td>
+                                <strong>${item.equipamento}</strong><br>
+                                <small class="text-secondary">Patrimônio: ${item.patrimonio}</small>
+                            </td>
+                            <td class="text-end pe-3">
+                                <span class="badge ${item.badge}">${item.status}</span>
+                            </td>
+                        `;
+                        corpoTabela.appendChild(tr);
+                    });
+                }
+            });
+
+            // 1. FILTRO DE BUSCA DA FILA
+            const inputBusca = document.getElementById('inputBusca');
+            const btnBusca = document.getElementById('btnBusca');
+            const tabelaAtendimentos = document.getElementById('tabelaAtendimentos');
+            const linhas = tabelaAtendimentos.getElementsByTagName('tr');
+
+            function filtrarFila() {
+                const termo = inputBusca.value.toLowerCase();
+                for (let i = 0; i < linhas.length; i++) {
+                    let texto = linhas[i].textContent.toLowerCase();
+                    linhas[i].style.display = texto.includes(termo) ? '' : 'none';
+                }
+            }
+            inputBusca.addEventListener('keyup', filtrarFila);
+            btnBusca.addEventListener('click', filtrarFila);
+
+            // 2. CONTROLE DO MODAL DE ATENDIMENTO
+            const modalAtendimentoEl = document.getElementById('modalAtendimentoEstagiario');
+            const modalAtendimento = new bootstrap.Modal(modalAtendimentoEl);
+
+            const labelAluno = document.getElementById('labelAluno');
+            const labelEquipamento = document.getElementById('labelEquipamento');
+            const labelFotoTitulo = document.getElementById('labelFotoTitulo');
+            const btnSalvarAtendimento = document.getElementById('btnSalvarAtendimento');
+
+            tabelaAtendimentos.addEventListener('click', function(e) {
+                const btn = e.target.closest('.btn-atender');
+                if (!btn) return;
+
+                const acao = btn.getAttribute('data-acao');
+                const aluno = btn.getAttribute('data-aluno');
+                const equipamento = btn.getAttribute('data-equipamento');
+
+                labelAluno.textContent = aluno;
+                labelEquipamento.textContent = equipamento;
+
+                document.getElementById('inputAluno').value = aluno;
+                document.getElementById('inputEquipamento').value = equipamento;
+
+                if (acao === 'saida') {
+                    labelFotoTitulo.textContent = 'Foto do Equipamento na Entrega (Saída)';
+                    btnSalvarAtendimento.textContent = 'Confirmar Saída do Material';
+                    btnSalvarAtendimento.className = 'btn btn-primary fw-bold';
+                } else {
+                    labelFotoTitulo.textContent = 'Foto do Equipamento na Devolução (Retorno)';
+                    btnSalvarAtendimento.textContent = 'Confirmar Devolução do Material';
+                    btnSalvarAtendimento.className = 'btn btn-success fw-bold';
+                }
+
+                modalAtendimento.show();
+            });
+
+            // 3. COMPONENTE DE UPLOAD DE FOTO (COM CLIQUE NA CAIXA E DRAG & DROP)
+            document.querySelectorAll('[data-foto-upload]').forEach(initFotoUpload);
+
+            function initFotoUpload(root) {
+                const input = root.querySelector('.foto-input');
+                const img = root.querySelector('.foto-preview');
+                const placeholder = root.querySelector('.foto-placeholder');
+                const btnRemover = root.querySelector('.foto-remover');
+                const erro = root.querySelector('.foto-erro');
+                const dropZone = root.querySelector('.foto-box');
+
+                const maxMb = parseFloat(root.dataset.maxMb || 5);
+                const tiposOk = ['image/jpeg', 'image/png', 'image/webp'];
+                let urlAtual = null;
+
+                dropZone.addEventListener('click', () => input.click());
+
+                function limpar() {
+                    input.value = '';
+                    if (urlAtual) URL.revokeObjectURL(urlAtual);
+                    urlAtual = null;
+                    img.removeAttribute('src');
+                    img.classList.add('d-none');
+                    placeholder.classList.remove('d-none');
+                    btnRemover.classList.add('d-none');
+                }
+
+                input.addEventListener('change', () => {
+                    erro.textContent = '';
+                    const arquivo = input.files[0];
+                    if (!arquivo) return limpar();
+
+                    if (!tiposOk.includes(arquivo.type)) {
+                        limpar();
+                        erro.textContent = 'Formato inválido. Use JPG, PNG ou WEBP.';
+                        return;
+                    }
+                    if (arquivo.size > maxMb * 1024 * 1024) {
+                        limpar();
+                        erro.textContent = `Arquivo muito grande (máx. ${maxMb} MB).`;
+                        return;
+                    }
+
+                    if (urlAtual) URL.revokeObjectURL(urlAtual);
+                    urlAtual = URL.createObjectURL(arquivo);
+                    img.src = urlAtual;
+                    img.classList.remove('d-none');
+                    placeholder.classList.add('d-none');
+                    btnRemover.classList.remove('d-none');
+                });
+
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evento => {
+                    dropZone.addEventListener(evento, (e) => { e.preventDefault(); e.stopPropagation(); }, false);
+                });
+
+                ['dragenter', 'dragover'].forEach(evento => {
+                    dropZone.addEventListener(evento, () => {
+                        dropZone.style.backgroundColor = '#e2e8f0';
+                        dropZone.style.borderColor = '#0284c7';
+                    }, false);
+                });
+
+                ['dragleave', 'drop'].forEach(evento => {
+                    dropZone.addEventListener(evento, () => {
+                        dropZone.style.backgroundColor = '#f8fafc';
+                        dropZone.style.borderColor = '#cbd5e1';
+                    }, false);
+                });
+
+                dropZone.addEventListener('drop', (e) => {
+                    const ficheiros = e.dataTransfer.files;
+                    if (ficheiros && ficheiros.length > 0) {
+                        input.files = ficheiros;
+                        input.dispatchEvent(new Event('change'));
+                    }
+                }, false);
+
+                btnRemover.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    erro.textContent = ''; 
+                    limpar();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

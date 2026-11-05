@@ -3,23 +3,6 @@
     ============================================================
     TELA: Cadastro - Reserva FEEC
     ============================================================
-    O QUE ESTA TELA ENTREGA VISUALMENTE:
-    Um cartão centralizado (mesmo estilo "Tech" da tela de Login,
-    reaproveitando login.css) contendo o logo da UFAM, um título
-    "Novo Cadastro" e um formulário com os campos:
-      - Nome completo
-      - CPF (com máscara automática 000.000.000-00)
-      - Telefone (com máscara automática (00) 00000-0000)
-      - Matrícula
-      - Vínculo com a UFAM (select: aluno grad. / pós / professor)
-      - E-mail e confirmação de e-mail
-      - Senha e confirmação de senha
-      - Botão "Finalizar Cadastro"
-    Além disso, um botão flutuante no canto da tela permite alternar
-    entre tema claro/escuro, e essa preferência é lembrada mesmo
-    depois de fechar o navegador (localStorage). Ao final, há um
-    link para voltar à tela de Login.
-    ============================================================
 -->
 <html lang="pt-BR">
 <head>
@@ -27,102 +10,125 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro - Reserva FEEC</title>
 
-    <!-- Framework de estilos base (grid, botões, inputs prontos) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-    <!-- CSS próprio do projeto: reutiliza o mesmo arquivo da tela de Login
-         para manter a identidade visual "Tech" (cores, cartão, tema claro/escuro) -->
     <link rel="stylesheet" href="{{ url_for('static', filename='login.css') }}">
 </head>
 <body>
 
-    <!-- ============================================================
-         CARTÃO PRINCIPAL DO FORMULÁRIO
-         Centralizado na tela via classe "login-wrapper" (definida no CSS externo)
-         ============================================================ -->
     <div class="login-wrapper">
-        <div class="card login-card" style="max-width: 500px;"> <!-- um pouco mais largo que o card de login, pois há campos lado a lado -->
+        <div class="card login-card" style="max-width: 550px;">
 
-            <!-- Cabeçalho: logo + título + subtítulo explicativo -->
-            <div class="text-center mb-4">
-                <img src="{{ url_for('static', filename='logo-ufam.png') }}" alt="Logo UFAM" width="75" class="mb-3">
+        <div class="text-center mb-4">
+
+            <!--
+              LINHA 1: Logos UFAM e FEEC lado a lado.
+              - src: imagem padrão (carregada inicialmente).
+              - data-dark / data-light: versões usadas pelo JS ao alternar o tema.
+              - Os IDs (logoUfam, logoFeec) são usados pelo script de troca de tema:
+                NÃO renomear sem atualizar o JS.
+            -->
+            <div class="d-flex justify-content-center align-items-center gap-4 mb-3">
+                <img id="logoUfam"
+                    src="{{ url_for('static', filename='logo-ufam.svg') }}"
+                    data-dark="{{ url_for('static', filename='logo-ufam-dark.png') }}"
+                    data-light="{{ url_for('static', filename='logo-ufam-light.svg') }}"
+                    alt="Logo UFAM" width="110">
+
+                <!-- A logo da FEEC usa o mesmo arquivo nos dois temas -->
+                <img id="logoFeec"
+                    src="{{ url_for('static', filename='logo-feec3.png') }}"
+                    data-dark="{{ url_for('static', filename='logo-feec3.png') }}"
+                    data-light="{{ url_for('static', filename='logo-feec3.png') }}"
+                    alt="Logo FEEC" width="90">
+            </div>
+
+            <!--
+              LINHA 2: Logo do PPGEE centralizada.
+              Tema escuro: versão branca. Tema claro: versão colorida.
+            -->
+            <div class="mb-4">
+                <img id="logoPpgee"
+                    src="{{ url_for('static', filename='ppgee-branca.png') }}"
+                    data-dark="{{ url_for('static', filename='ppgee-branca.png') }}"
+                    data-light="{{ url_for('static', filename='ppgee-colorido.png') }}"
+                    alt="Logo PPGEE" width="120">
+            </div>
                 <h4 class="fw-bold text-dark">Novo Cadastro</h4>
                 <p class="text-muted mb-0 small">Solicite seu acesso aos equipamentos do Laboratório de Controle e Energia</p>
             </div>
 
-            <!-- Formulário enviado via POST para a rota /cadastro no backend (Flask) -->
-            <form action="/cadastro" method="POST">
+            <!-- Adicionado id="formCadastro" e classe 'needs-validation' -->
+            <form id="formCadastro" action="/cadastro" method="POST" class="needs-validation" >
 
-                <!-- ---------- Nome Completo ---------- -->
                 <div class="mb-3">
                     <label for="nome" class="form-label fw-semibold text-secondary small">Nome Completo</label>
-                    <input type="text" class="form-control" id="nome" name="nome" placeholder="Seu nome e sobrenome" required>
+                    <input type="text" class="form-control" id="nome" name="nome" placeholder="Seu nome e sobrenome" required minlength="5">
+                    <div class="invalid-feedback">Por favor, insira seu nome completo.</div>
                 </div>
 
-                <!-- ---------- CPF e Telefone (lado a lado) ---------- -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="cpf" class="form-label fw-semibold text-secondary small">CPF</label>
-                        <!-- A máscara de digitação (pontos e traço) é aplicada pelo SCRIPT 2, mais abaixo -->
-                        <input type="text" class="form-control" id="cpf" name="cpf" placeholder="000.000.000-00" required maxlength="14" inputmode="numeric">
+                        <!-- minlength="14" garante que ele digite a máscara inteira -->
+                        <input type="text" class="form-control" id="cpf" name="cpf" placeholder="000.000.000-00" required maxlength="14" minlength="14" inputmode="numeric">
+                        <div class="invalid-feedback">Digite um CPF válido (11 dígitos).</div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="telefone" class="form-label fw-semibold text-secondary small">Telefone</label>
-                        <!-- A máscara de digitação (parênteses e traço) é aplicada pelo SCRIPT 3, mais abaixo -->
-                        <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="(92) 90000-0000" required maxlength="15" inputmode="numeric">
+                        <input type="tel" class="form-control" id="telefone" name="telefone" placeholder="(92) 90000-0000" required maxlength="15" minlength="14" inputmode="numeric">
+                        <div class="invalid-feedback">Digite um telefone válido.</div>
                     </div>
                 </div>
 
-                <!-- ---------- Matrícula e Vínculo (lado a lado) ---------- -->
                 <div class="row">
                     <div class="col-md-6 mb-3">
                         <label for="matricula" class="form-label fw-semibold text-secondary small">Matrícula</label>
-                        <input type="text" class="form-control" id="matricula" name="matricula" placeholder="Ex: 21900000" required>
+                        <input type="text" class="form-control" id="matricula" name="matricula" placeholder="Ex: 21900000" required minlength="5">
+                        <div class="invalid-feedback">A matrícula é obrigatória.</div>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label for="vinculo" class="form-label fw-semibold text-secondary small">Vínculo com a UFAM</label>
-                        <!-- form-select + form-control juntas: garante o estilo escuro customizado do login.css
-                             e ao mesmo tempo o comportamento nativo de <select> do Bootstrap -->
                         <select class="form-select form-control" id="vinculo" name="vinculo" required>
-                            <option value="">Selecione...</option>
+                            <option value="" selected disabled>Selecione...</option>
                             <option value="aluno_grad">Aluno de Graduação</option>
                             <option value="aluno_pos">Aluno de Pós/Mestrado</option>
                             <option value="professor">Professor / Pesquisador</option>
                         </select>
+                        <div class="invalid-feedback">Selecione seu vínculo.</div>
                     </div>
                 </div>
 
-                <!-- ---------- E-mail e Confirmação (lado a lado) ----------->
                 <div class="row">
-                    <div class="col-md-6 mb-4">
+                    <div class="col-md-6 mb-3">
                         <label for="email" class="form-label fw-semibold text-secondary small">Informe um e-mail</label>
                         <input type="email" class="form-control" id="email" name="email" placeholder="seu.email@ufam.edu.br" required>
+                        <div class="invalid-feedback">Informe um e-mail válido.</div>
                     </div>
-                    <div class="col-md-6 mb-4">
+                    <div class="col-md-6 mb-3">
                         <label for="confirma_email" class="form-label fw-semibold text-secondary small">Confirme o e-mail</label>
-                        <input type="email" class="form-control" id="confirma_email" name="confirma_email" placeholder="seu.email@ufam.edu.br" required>
+                        <input type="email" class="form-control" id="confirma_email" name="confirma_email" placeholder="Repita o e-mail" required>
+                        <div class="invalid-feedback" id="feedbackEmail">Os e-mails não coincidem.</div>
                     </div>
                 </div>
 
-                <!-- ---------- Senha e Confirmação (lado a lado) ------------>
                 <div class="row">
                     <div class="col-md-6 mb-4">
                         <label for="senha" class="form-label fw-semibold text-secondary small">Crie uma Senha</label>
-                        <input type="password" class="form-control" id="senha" name="senha" required minlength="6">
+                        <input type="password" class="form-control" id="senha" name="senha" required minlength="6" placeholder="Mínimo 6 caracteres">
+                        <div class="invalid-feedback">A senha deve ter no mínimo 6 caracteres.</div>
                     </div>
                     <div class="col-md-6 mb-4">
                         <label for="confirma_senha" class="form-label fw-semibold text-secondary small">Confirme a Senha</label>
-                        <input type="password" class="form-control" id="confirma_senha" name="confirma_senha" required minlength="6">
+                        <input type="password" class="form-control" id="confirma_senha" name="confirma_senha" required minlength="6" placeholder="Repita a senha">
+                        <div class="invalid-feedback" id="feedbackSenha">As senhas não coincidem.</div>
                     </div>
                 </div>
 
-                <!-- ---------- Botão de envio do formulário ---------- -->
                 <div class="d-grid gap-2">
                     <button type="submit" class="btn btn-primary fw-bold text-uppercase">Finalizar Cadastro</button>
                 </div>
             </form>
 
-            <!-- Link para quem já tem conta voltar à tela de Login -->
             <div class="text-center mt-4 pt-3 border-top" style="border-color: rgba(148, 163, 184, 0.2) !important;">
                 <p class="small text-muted mb-0">Já tem uma conta?
                     <a href="/" class="text-decoration-none fw-bold link-custom">Voltar para o Login</a>
@@ -131,7 +137,7 @@
         </div>
     </div>
 
-    <!-- ============================================================
+<!-- ============================================================
          Botão Flutuante de Tema (claro/escuro)
          ============================================================ -->
     <button class="btn-theme-toggle" id="themeToggle" title="Alternar Tema">
@@ -139,96 +145,43 @@
     </button>
 
     <script>
-        // ==========================================
-        // SCRIPT 1: LÓGICA DO MODO CLARO / ESCURO
-        // ==========================================
-        // Guarda a preferência de tema no localStorage do navegador,
-        // então ela é lembrada mesmo se o usuário fechar e voltar depois.
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const body = document.body;
 
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
+    // Função que varre os logos e atualiza as imagens conforme o tema ativo
+    function atualizarLogos() {
+        const isLight = body.classList.contains('light-theme');
+        const logos = document.querySelectorAll('#logoUfam, #logoFeec, #logoPpgee');
 
-        // Ao carregar a página, verifica se o usuário já escolheu o tema claro antes
-        if (localStorage.getItem('theme') === 'light') {
-            body.classList.add('light-theme'); // aplica o tema claro
-            themeToggleBtn.innerHTML = '🌙';   // ícone de lua = "clique para escurecer"
+        logos.forEach(logo => {
+            const novaSrc = isLight ? logo.getAttribute('data-light') : logo.getAttribute('data-dark');
+            if (novaSrc) {
+                logo.src = novaSrc;
+            }
+        });
+    }
+
+    // 1. Ao carregar a página: aplica o tema salvo e atualiza os logos
+    if (localStorage.getItem('theme') === 'light') {
+        body.classList.add('light-theme');
+        themeToggleBtn.innerHTML = '🌙';
+    }
+    atualizarLogos(); // Atualiza a fonte das imagens ao carregar
+
+    // 2. Ao clicar no botão: alterna o tema, salva a escolha e atualiza os logos
+    themeToggleBtn.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+
+        if (body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+            themeToggleBtn.innerHTML = '🌙';
+        } else {
+            localStorage.setItem('theme', 'dark');
+            themeToggleBtn.innerHTML = '☀️';
         }
 
-        // Ao clicar no botão, alterna o tema e salva a nova escolha
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('light-theme');
-
-            if (body.classList.contains('light-theme')) {
-                localStorage.setItem('theme', 'light');
-                themeToggleBtn.innerHTML = '🌙';
-            } else {
-                localStorage.setItem('theme', 'dark');
-                themeToggleBtn.innerHTML = '☀️';
-            }
-        });
-    </script>
-
-    <script>
-        // ==========================================
-        // SCRIPT 2: MÁSCARA AUTOMÁTICA DO CPF
-        // Formata a digitação em tempo real para 000.000.000-00
-        // ==========================================
-
-        const cpfInput = document.getElementById('cpf');
-
-        cpfInput.addEventListener('input', function (e) {
-            let valor = e.target.value;
-
-            // Remove tudo que não for número (impede letras/símbolos)
-            valor = valor.replace(/\D/g, "");
-
-            // Limita a 11 dígitos (tamanho do CPF sem pontuação)
-            if (valor.length > 11) {
-                valor = valor.slice(0, 11);
-            }
-
-            // Insere os separadores na posição correta
-            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");       // primeiro ponto
-            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");       // segundo ponto
-            valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); // traço final
-
-            e.target.value = valor;
-        });
-    </script>
-
-    <script>
-        // ==========================================
-        // SCRIPT 3: MÁSCARA AUTOMÁTICA DO TELEFONE
-        // Formata a digitação em tempo real para (00) 00000-0000
-        // ==========================================
-
-        const telefoneInput = document.getElementById('telefone');
-
-        telefoneInput.addEventListener('input', function (e) {
-            let valor = e.target.value;
-
-            // Remove tudo que não for número
-            valor = valor.replace(/\D/g, "");
-
-            // Limita a 11 dígitos (2 do DDD + 9 do celular)
-            if (valor.length > 11) {
-                valor = valor.slice(0, 11);
-            }
-
-            // Envolve o DDD em parênteses assim que houver mais de 2 dígitos
-            if (valor.length > 2) {
-                valor = valor.replace(/^(\d{2})(\d)/g, "($1) $2");
-            }
-
-            // Coloca o traço no lugar certo, diferenciando celular (9 dígitos) de fixo (8 dígitos)
-            if (valor.length > 9) {
-                valor = valor.replace(/(\d{5})(\d)/, "$1-$2"); // celular: (92) 91234-5678
-            } else if (valor.length > 6) {
-                valor = valor.replace(/(\d{4})(\d)/, "$1-$2"); // fixo: (92) 3333-4444
-            }
-
-            e.target.value = valor;
-        });
-    </script>
+        atualizarLogos(); // Troca as imagens dinamicamente no clique
+    });
+</script>
 </body>
 </html>

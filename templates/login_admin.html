@@ -40,90 +40,159 @@
          A borda vermelha no topo (border-top) é só um reforço visual
          para diferenciar esta tela do login comum de aluno.
          ============================================================ -->
-    <div class="login-wrapper">
-        <div class="card login-card" style="border-top: 4px solid #dc3545;">
+    <!-- Wrapper que centraliza o card de login na tela (classe definida no CSS do projeto) -->
+<div class="login-wrapper">
 
-            <!-- Cabeçalho: brasão + nome da instituição + selo de área restrita + título -->
-            <div class="text-center mb-4">
-                <img src="{{ url_for('static', filename='logo-ufam.png') }}" alt="Brasão UFAM" width="70" class="mb-2">
+    <!-- Card principal. A borda superior vermelha reforça que é uma área restrita -->
+    <div class="card login-card" style="border-top: 4px solid #dc3545;">
 
-                
-                <!-- Selo vermelho de "Área Restrita" perfeitamente centralizado com mx-auto e d-block -->
-                <span class="badge bg-danger mb-2 px-3 py-2 d-block mx-auto text-uppercase" style="letter-spacing: 0.5px; max-width: max-content;">ÁREA RESTRITA</span>
+        <!-- ==================== Cabeçalho Institucional ==================== -->
+        <div class="text-center mb-4">
 
-                
-                <!-- Trocado 'text-dark' pela variável de título dinâmica -->
-                <h5 class="fw-bold mt-2" style="color: var(--texto-titulo) !important;">Painel do Administrador</h5>
-                <p class="mb-0 small" style="color: var(--texto-subtitulo) !important;">Gestão de Equipamentos e Reservas</p>
+            
+            <div class="d-flex justify-content-center align-items-center gap-4 mb-3">
+
+            <!--
+              LINHA 1: Logos UFAM e FEEC lado a lado.
+              - src: imagem padrão (carregada inicialmente).
+              - data-dark / data-light: versões usadas pelo JS ao alternar o tema.
+              - Os IDs (logoUfam, logoFeec) são usados pelo script de troca de tema:
+                NÃO renomear sem atualizar o JS.
+            -->
+
+                <img id="logoUfam" 
+                    src="{{ url_for('static', filename='logo-ufam.svg') }}" 
+                    data-dark="{{ url_for('static', filename='logo-ufam-dark.png') }}"
+                    data-light="{{ url_for('static', filename='logo-ufam-light.svg') }}" 
+                    alt="Logo UFAM">
+                    
+                <!-- A logo da FEEC usa o mesmo arquivo nos dois temas -->
+                <img id="logoFeec"
+                    src="{{ url_for('static', filename='logo-feec3.png') }}"
+                    data-dark="{{ url_for('static', filename='logo-feec3.png') }}"
+                    data-light="{{ url_for('static', filename='logo-feec3.png') }}"
+                    alt="Logo FEEC" width="90">
             </div>
 
-
-            <!-- Formulário enviado via POST para a rota /login-admin no backend (Flask) -->
-            <form action="/login-admin" method="POST">
-
-                <!-- ---------- Identificação (SIAPE ou e-mail institucional) ---------- -->
-                <div class="mb-3">
-                    <label for="siape" class="form-label fw-semibold text-secondary small">SIAPE ou E-mail Institucional</label>
-                    <input type="text" class="form-control" id="siape" name="siape" placeholder="Ex: 1234567" required autocomplete="username">
-                </div>
-
-                <!-- ---------- Senha de acesso ---------- -->
-                <div class="mb-4">
-                    <label for="senha" class="form-label fw-semibold text-secondary small">Senha de Acesso</label>
-                    <input type="password" class="form-control" id="senha" name="senha" required autocomplete="current-password">
-                </div>
-
-                <!-- ---------- Botão de envio ----------
-                     Usa "btn-danger" (vermelho) em vez do azul padrão do login de
-                     aluno, mantendo a mesma identidade visual de "área restrita" -->
-                <div class="d-grid gap-2">
-                    <button type="submit" class="btn btn-danger fw-bold text-uppercase" style="padding: 12px; font-size: 1.05rem;">
-                        Entrar na Administração
-                    </button>
-                </div>
-            </form>
-
-            <!-- Link para voltar ao login comum de alunos -->
-            <div class="text-center mt-4 pt-3 border-top" style="border-color: rgba(148, 163, 184, 0.2) !important;">
-                <a href="/" class="text-decoration-none fw-bold link-custom">← Voltar ao Login de Alunos</a>
+            <!--
+              LINHA 2: Logo do PPGEE centralizada.
+              Tema escuro: versão branca. Tema claro: versão colorida.
+            -->
+            <div class="mb-4">
+                <img id="logoPpgee"
+                    src="{{ url_for('static', filename='ppgee-branca.png') }}"
+                    data-dark="{{ url_for('static', filename='ppgee-branca.png') }}"
+                    data-light="{{ url_for('static', filename='ppgee-colorido.png') }}"
+                    alt="Logo PPGEE" width="120">
             </div>
+
+            <!--
+              Selo vermelho "ÁREA RESTRITA".
+              d-inline-block permite centralizar dentro da div text-center.
+            -->
+            <span class="badge bg-danger mb-2 px-3 py-2 d-inline-block text-uppercase shadow-sm" style="letter-spacing: 0.5px;">
+                ÁREA RESTRITA
+            </span>
+
+            <!--
+              Títulos da página.
+              !important é necessário para sobrescrever o estilo padrão do Bootstrap.
+              As cores vêm das variáveis CSS do tema (claro/escuro).
+            -->
+            <h5 class="fw-bold mt-2" style="color: var(--texto-titulo) !important;">Painel do Administrador</h5>
+            <p class="mb-0 small" style="color: var(--texto-subtitulo) !important;">Gestão de Equipamentos e Reservas</p>
+        </div>
+
+
+        <!--
+          ==================== Formulário de Login ====================
+          - Enviado via POST para /login-admin (rota Flask).
+          - O backend deve ler request.form['siape'] e request.form['senha'].
+          - Os atributos "name" dos inputs devem coincidir com os usados no backend.
+        -->
+        <form action="/login-admin" method="POST">
+
+            <!-- Identificação: aceita SIAPE ou e-mail institucional (a validação é feita no backend) -->
+            <div class="mb-3">
+                <label for="siape" class="form-label fw-semibold text-secondary small">SIAPE ou E-mail Institucional</label>
+                <input type="text" class="form-control" id="siape" name="siape" placeholder="Ex: 1234567" required autocomplete="username">
+            </div>
+
+            <!-- Senha de acesso (autocomplete permite que o navegador sugira a senha salva) -->
+            <div class="mb-4">
+                <label for="senha" class="form-label fw-semibold text-secondary small">Senha de Acesso</label>
+                <input type="password" class="form-control" id="senha" name="senha" required autocomplete="current-password">
+            </div>
+
+            <!-- Botão de envio (d-grid faz o botão ocupar toda a largura do card) -->
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-danger fw-bold text-uppercase shadow-sm" style="padding: 12px; font-size: 1.05rem;">
+                    Entrar na Administração
+                </button>
+            </div>
+        </form>
+
+        <!--
+          Link para voltar ao login comum de alunos (rota raiz "/").
+          A borda superior usa cor translúcida para funcionar nos dois temas.
+        -->
+        <div class="text-center mt-4 pt-3 border-top" style="border-color: rgba(148, 163, 184, 0.2) !important;">
+            <a href="/" class="text-decoration-none fw-bold link-custom">← Voltar ao Login de Alunos</a>
         </div>
     </div>
+</div>
 
-    <!-- ============================================================
+ <!-- ============================================================
          Botão Flutuante de Tema (claro/escuro)
          ============================================================ -->
     <button class="btn-theme-toggle" id="themeToggle" title="Alternar Tema">
         ☀️
     </button>
 
-    <!-- ============================================================
-         Script: persistência do Tema Claro/Escuro
-         Guarda a preferência no localStorage do navegador, então ela
-         é lembrada mesmo depois de fechar e reabrir a página.
-         ============================================================ -->
     <script>
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const body = document.body;
 
-        // Ao carregar a página, verifica se o usuário já escolheu o tema claro antes
-        if (localStorage.getItem('theme') === 'light') {
-            body.classList.add('light-theme'); // aplica o tema claro
-            themeToggleBtn.innerHTML = '🌙';   // ícone de lua = "clique para escurecer"
-        }
+    // Função que varre os logos e atualiza as imagens conforme o tema ativo
+    function atualizarLogos() {
+        const isLight = body.classList.contains('light-theme');
+        const logos = document.querySelectorAll('#logoUfam, #logoFeec, #logoPpgee');
 
-        // Ao clicar no botão, alterna o tema e salva a nova escolha
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('light-theme');
-
-            if (body.classList.contains('light-theme')) {
-                localStorage.setItem('theme', 'light');
-                themeToggleBtn.innerHTML = '🌙';
-            } else {
-                localStorage.setItem('theme', 'dark');
-                themeToggleBtn.innerHTML = '☀️';
+        logos.forEach(logo => {
+            const novaSrc = isLight ? logo.getAttribute('data-light') : logo.getAttribute('data-dark');
+            if (novaSrc) {
+                logo.src = novaSrc;
             }
         });
-    </script>
+    }
+
+    // 1. Ao carregar a página: aplica o tema salvo e atualiza os logos
+    if (localStorage.getItem('theme') === 'light') {
+        body.classList.add('light-theme');
+        themeToggleBtn.innerHTML = '🌙';
+    }
+    atualizarLogos(); // Atualiza a fonte das imagens ao carregar
+
+    // 2. Ao clicar no botão: alterna o tema, salva a escolha e atualiza os logos
+    themeToggleBtn.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+
+        if (body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+            themeToggleBtn.innerHTML = '🌙';
+        } else {
+            localStorage.setItem('theme', 'dark');
+            themeToggleBtn.innerHTML = '☀️';
+        }
+
+        atualizarLogos(); // Troca as imagens dinamicamente no clique
+    });
+</script>
 </body>
+<!-- Botão flutuante de Acesso para Estagiários no canto superior direito -->
+    <div style="position: absolute; top: 20px; right: 20px; z-index: 1000;">
+        <a href="/estagiario" class="btn btn-outline-info btn-sm fw-bold shadow-sm d-flex align-items-center gap-1" style="background-color: rgba(15, 23, 42, 0.7); backdrop-filter: blur(5px);">
+            <i class="bi bi-person-badge"></i> Acesso Estagiário
+        </a>
+    </div>
 </html>

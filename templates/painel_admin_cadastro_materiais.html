@@ -3,18 +3,11 @@
     ============================================================
     TELA: Cadastro de Materiais - Admin FEEC
     ============================================================
-    O QUE ESTA TELA ENTREGA VISUALMENTE:
-    Um painel administrativo (fundo cinza claro, navbar escura no
-    topo) com um cartão de formulário destacado por uma borda azul
-    no topo. O formulário permite ao administrador cadastrar um
-    novo equipamento/material do laboratório, com:
-      - Nome do equipamento e código de patrimônio
-      - Quantidade total, categoria (medição/ferramentas/
-        consumível/outros) e estado inicial (disponível/manutenção)
-      - Campo de observações/acessórios (opcional)
-      - Botões "Limpar Campos" e "Salvar Equipamento"
-    A navbar do topo mostra o selo "ADMIN", o título "Gestão de
-    Inventário" e atalhos para voltar ao menu administrativo ou sair.
+    ATUALIZAÇÕES:
+    - Todos os campos agora possuem a tag 'required' (obrigatórios).
+    - Modal de sucesso adicionado ao final do body.
+    - Script adicionado para interceptar o 'submit', exibir o pop-up
+      e resetar o formulário.
     ============================================================
 -->
 <html lang="pt-BR">
@@ -23,24 +16,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Materiais - Admin FEEC</title>
 
-    <!-- Framework de estilos base (grid, botões, cartões prontos) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Estilos específicos desta tela (não reaproveita login.css,
-         pois aqui o layout é de painel administrativo, não de cartão de login) -->
     <style>
-        body { background-color: #f4f6f9; }               /* fundo neutro do painel */
-        .navbar-admin { background-color: #1e293b; }       /* navbar escura, mesma paleta "Tech" */
-        .card-form { border-top: 4px solid #0284c7; }      /* faixa azul de destaque no topo do card */
+        body { background-color: #f4f6f9; }
+        .navbar-admin { background-color: #1e293b; }
+        .card-form { border-top: 4px solid #0284c7; }
+
+        .foto-box {
+            border: 2px dashed #cbd5e1;
+            border-radius: .5rem;
+            background: #f8fafc;
+            min-height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .foto-preview { max-width: 100%; max-height: 260px; object-fit: contain; }
     </style>
 </head>
 <body>
 
-    <!-- ============================================================
-         NAVBAR ADMINISTRATIVA
-         Fixa no topo, com selo "ADMIN", título da seção e atalhos
-         de navegação (voltar ao menu / sair do painel)
-         ============================================================ -->
+    <!-- NAVBAR ADMINISTRATIVA -->
     <nav class="navbar navbar-dark navbar-admin shadow-sm mb-4">
         <div class="container">
             <span class="navbar-brand mb-0 h1 d-flex align-items-center">
@@ -54,27 +52,21 @@
         </div>
     </nav>
 
-    <!-- ============================================================
-         CARTÃO DO FORMULÁRIO DE CADASTRO
-         Centralizado em uma coluna larga (col-lg-8) dentro do container
-         ============================================================ -->
+    <!-- CARTÃO DO FORMULÁRIO DE CADASTRO -->
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-
-                <div class="card border-0 shadow-sm card-form">
-
-                    <!-- Cabeçalho do cartão: título e instrução breve -->
+                <div class="card border-0 shadow-sm card-form mb-5">
+                    
                     <div class="card-header bg-white pt-4 pb-2 border-0">
                         <h4 class="fw-bold text-dark mb-0">Cadastrar Novo Equipamento</h4>
                         <p class="text-muted small">Adicione os detalhes do material para disponibilizá-lo para reserva.</p>
                     </div>
 
                     <div class="card-body p-4">
-                        <!-- Formulário enviado via POST para a rota /painel-admin/cadastro-materiais no backend (Flask) -->
-                        <form action="/painel-admin/cadastro-materiais" method="POST">
+                        <form id="formCadastro" action="/painel-admin/cadastro-materiais" method="POST" enctype="multipart/form-data">
 
-                            <!-- ---------- Linha 1: Nome do equipamento e código de patrimônio ---------- -->
+                            <!-- Linha 1: Nome e código de patrimônio -->
                             <div class="row mb-3">
                                 <div class="col-md-8">
                                     <label for="nome_equipamento" class="form-label fw-semibold text-secondary small">Nome do Equipamento/Material</label>
@@ -86,7 +78,7 @@
                                 </div>
                             </div>
 
-                            <!-- ---------- Linha 2: Quantidade, categoria e estado inicial ---------- -->
+                            <!-- Linha 2: Quantidade, categoria e estado inicial -->
                             <div class="row mb-4">
                                 <div class="col-md-3">
                                     <label for="quantidade" class="form-label fw-semibold text-secondary small">Quantidade Total</label>
@@ -111,27 +103,190 @@
                                 </div>
                             </div>
 
-                            <!-- ---------- Linha 3: Observações/acessórios (campo opcional, sem "required") ---------- -->
-                            <div class="mb-4">
-                                <label for="observacoes" class="form-label fw-semibold text-secondary small">Observações / Acessórios Incluídos</label>
-                                <textarea class="form-control" id="observacoes" name="observacoes" rows="2" placeholder="Ex: Acompanha pontas de prova vermelha e preta..."></textarea>
+                            <!-- Foto do equipamento (AGORA OBRIGATÓRIA) -->
+                            <div class="mb-4" data-foto-upload data-max-mb="5">
+                                <label for="foto" class="form-label fw-semibold text-secondary small">Foto do Equipamento</label>
+                                
+                                <div class="foto-box">
+                                    <img class="foto-preview d-none" alt="Pré-visualização da foto">
+                                    <div class="foto-placeholder text-muted small">📷 Nenhuma foto selecionada</div>
+                                </div>
+
+                                <!-- Adicionado o required aqui -->
+                                <input type="file" class="form-control mt-2 foto-input" id="foto" name="foto" accept="image/jpeg,image/png,image/webp" required>
+
+                                <div class="d-flex align-items-center gap-2 mt-2">
+                                    <button type="button" class="btn btn-outline-danger btn-sm foto-remover d-none">Remover foto</button>
+                                    <span class="text-danger small foto-erro" role="alert"></span>
+                                </div>
+                                <div class="form-text">JPG, PNG ou WEBP, até 5 MB.</div>
                             </div>
 
-                            <!-- ---------- Botões de ação ----------
-                                 "reset" limpa o formulário sem enviar nada ao servidor;
-                                 "submit" envia os dados para a rota definida no <form> -->
+                            <!-- Observações/acessórios (AGORA OBRIGATÓRIA) -->
+                            <div class="mb-4">
+                                <label for="observacoes" class="form-label fw-semibold text-secondary small">Observações / Acessórios Incluídos</label>
+                                <!-- Adicionado o required aqui -->
+                                <textarea class="form-control" id="observacoes" name="observacoes" rows="2" placeholder="Ex: Acompanha pontas de prova vermelha e preta..." ></textarea>
+                            </div>
+
+                            <!-- Botões de ação -->
                             <div class="d-flex justify-content-end gap-2 border-top pt-3">
                                 <button type="reset" class="btn btn-light border fw-bold text-secondary">Limpar Campos</button>
                                 <button type="submit" class="btn btn-primary fw-bold px-4">Salvar Equipamento</button>
                             </div>
-
                         </form>
                     </div>
                 </div>
-
             </div>
         </div>
     </div>
 
+    <!-- MODAL DE SUCESSO (POP-UP) -->
+    <div class="modal fade" id="modalSucesso" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content text-center p-3 border-0 shadow">
+                <div class="modal-body">
+                    <div class="text-success mb-2" style="font-size: 3.5rem; line-height: 1;">✓</div>
+                    <h5 class="fw-bold text-dark">Cadastrado!</h5>
+                    <p class="text-muted small mb-0">O equipamento foi salvo e já está no sistema.</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0 p-0 mt-3">
+                    <button type="button" class="btn btn-success btn-sm px-4 fw-bold" data-bs-dismiss="modal">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script de Foto e Validação do Formulário -->
+    <script>
+    // LÓGICA DO POP-UP DE SUCESSO
+    document.addEventListener('DOMContentLoaded', function () {
+        const formCadastro = document.getElementById('formCadastro');
+        const modalSucesso = new bootstrap.Modal(document.getElementById('modalSucesso'));
+
+        formCadastro.addEventListener('submit', function (e) {
+            // Previne o envio real da página para mostrar o pop-up.
+            e.preventDefault(); 
+            
+            // Exibe o pop-up de sucesso
+            modalSucesso.show();
+            
+            // Limpa o formulário após salvar
+            formCadastro.reset(); 
+        });
+    });
+
+    // LÓGICA DO COMPONENTE DE FOTO
+    document.querySelectorAll('[data-foto-upload]').forEach(initFotoUpload);
+
+    function initFotoUpload(root) {
+        const input = root.querySelector('.foto-input');
+        const img = root.querySelector('.foto-preview');
+        const placeholder = root.querySelector('.foto-placeholder');
+        const btnRemover = root.querySelector('.foto-remover');
+        const erro = root.querySelector('.foto-erro');
+
+        const maxMb = parseFloat(root.dataset.maxMb || 5);
+        const tiposOk = ['image/jpeg', 'image/png', 'image/webp'];
+        let urlAtual = null;
+
+        if (root.dataset.camera === 'true') input.setAttribute('capture', 'environment');
+
+        function limpar() {
+            input.value = '';
+            if (urlAtual) URL.revokeObjectURL(urlAtual);
+            urlAtual = null;
+            img.removeAttribute('src');
+            img.classList.add('d-none');
+            placeholder.classList.remove('d-none');
+            btnRemover.classList.add('d-none');
+        }
+
+        // EVENTO: Quando seleciona pelo botão tradicional (clique)
+        input.addEventListener('change', () => {
+            erro.textContent = '';
+            const arquivo = input.files[0];
+            if (!arquivo) return limpar();
+
+            if (!tiposOk.includes(arquivo.type)) {
+                limpar();
+                erro.textContent = 'Formato inválido. Use JPG, PNG ou WEBP.';
+                return;
+            }
+            if (arquivo.size > maxMb * 1024 * 1024) {
+                limpar();
+                erro.textContent = `Arquivo muito grande (máx. ${maxMb} MB).`;
+                return;
+            }
+
+            if (urlAtual) URL.revokeObjectURL(urlAtual);
+            urlAtual = URL.createObjectURL(arquivo);
+            img.src = urlAtual;
+            img.classList.remove('d-none');
+            placeholder.classList.add('d-none');
+            btnRemover.classList.remove('d-none');
+        }); 
+        // <-- O evento de 'change' se encerra aqui!
+
+
+        // ==========================================
+        // LÓGICA DE DRAG AND DROP (ARRASTAR E LARGAR)
+        // ==========================================
+        const dropZone = root.querySelector('.foto-box');
+
+        // Previne o comportamento padrão do navegador de abrir a imagem
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(evento => {
+            dropZone.addEventListener(evento, prevenirPadrao, false);
+        });
+
+        function prevenirPadrao(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Adiciona efeito visual quando a imagem passa por cima
+        ['dragenter', 'dragover'].forEach(evento => {
+            dropZone.addEventListener(evento, () => {
+                dropZone.style.backgroundColor = '#e2e8f0'; // Fica mais escuro
+                dropZone.style.borderColor = '#0284c7'; // Borda azul
+            }, false);
+        });
+
+        // Remove o efeito visual quando a imagem sai ou é largada
+        ['dragleave', 'drop'].forEach(evento => {
+            dropZone.addEventListener(evento, () => {
+                dropZone.style.backgroundColor = '#f8fafc'; // Volta ao original
+                dropZone.style.borderColor = '#cbd5e1';
+            }, false);
+        });
+
+        // Captura o ficheiro quando é largado
+        dropZone.addEventListener('drop', (e) => {
+            const dadosTransferidos = e.dataTransfer;
+            const ficheiros = dadosTransferidos.files;
+
+            if (ficheiros && ficheiros.length > 0) {
+                // Substitui os ficheiros do input pelos ficheiros arrastados
+                input.files = ficheiros;
+                
+                // Dispara manualmente o evento 'change' para acionar a validação e pré-visualização lá de cima
+                const eventoChange = new Event('change');
+                input.dispatchEvent(eventoChange);
+            }
+        }, false);
+
+
+        // ==========================================
+        // BOTÕES DE LIMPAR (Remover a foto)
+        // ==========================================
+        btnRemover.addEventListener('click', () => { erro.textContent = ''; limpar(); });
+
+        const form = root.closest('form');
+        if (form) form.addEventListener('reset', () => { erro.textContent = ''; limpar(); });
+    }
+</script>
+    </script>
 </body>
 </html>

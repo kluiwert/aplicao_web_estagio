@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciar Estoque - Admin FEEC</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
+    <style>
+        body { background-color: #f4f6f9; }
+        .navbar-admin { background-color: #1e293b; }
+        .table-hover tbody tr:hover { background-color: #e2e8f0; cursor: pointer; }
+        .img-thumbnail-table { width: 60px; height: 60px; object-fit: cover; border-radius: 8px; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark navbar-admin shadow-sm mb-4">
+        <div class="container">
+            <span class="navbar-brand mb-0 h1 d-flex align-items-center">
+                <span class="badge bg-danger me-2">ADMIN</span> 
+                Gerenciamento de Estoque
+            </span>
+            <div class="d-flex gap-2">
+                <a href="/painel-admin/cadastro-materiais" class="btn btn-success btn-sm">+ Novo Item</a>
+                <a href="/painel-admin" class="btn btn-outline-light btn-sm">← Menu</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white p-3 border-bottom-0 d-flex justify-content-between align-items-center">
+                <h6 class="fw-bold text-secondary mb-0">Itens Cadastrados ({{ equipamentos | length }})</h6>
+                <small class="text-muted">Clique em um item para editar, desabilitar ou apagar.</small>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Foto</th>
+                            <th>Equipamento / Patrimônio</th>
+                            <th>Status</th>
+                            <th>Estoque (Disp / Total)</th>
+                            <th class="text-end pe-4">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in equipamentos %}
+                        <!-- A linha inteira é clicável e abre o modal correspondente ao ID do item -->
+                        <tr data-bs-toggle="modal" data-bs-target="#modalItem{{ item.id }}">
+                            <td class="ps-4">
+                                <img src="{{ item.foto if item.foto else 'https://placehold.co/100x100/e2e8f0/1e293b?text=Sem+Foto' }}" alt="Foto" class="img-thumbnail-table border shadow-sm">
+                            </td>
+                            <td>
+                                <strong class="text-dark">{{ item.nome }}</strong><br>
+                                <small class="text-muted">{{ item.patrimonio }}</small>
+                            </td>
+                            <td>
+                                {% if item.status == 'disponivel' %}
+                                    <span class="badge bg-success">Ativo</span>
+                                {% elif item.status == 'parcial' %}
+                                    <span class="badge bg-warning text-dark">Em uso</span>
+                                {% else %}
+                                    <span class="badge bg-secondary">Desabilitado</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="fw-bold">{{ item.estoque_disp }}</span> / {{ item.estoque_total }}
+                            </td>
+                            <td class="text-end pe-4">
+                                <button class="btn btn-sm btn-outline-primary"><i class="bi bi-pencil-square"></i> Gerenciar</button>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center py-5 text-muted">Nenhum equipamento cadastrado.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- GERAÇÃO DOS MODAIS (POP-UPS) PARA CADA EQUIPAMENTO -->
+    {% for item in equipamentos %}
+    <div class="modal fade" id="modalItem{{ item.id }}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                
+                <div class="modal-header bg-dark text-white border-0">
+                    <h5 class="modal-title fw-bold">Detalhes do Equipamento</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                
+                <form action="/painel-admin/estoque/atualizar" method="POST">
+                    <div class="modal-body p-4">
+                        <input type="hidden" name="id" value="{{ item.id }}">
+                        
+                        <!-- Imagem do Equipamento -->
+                        <div class="text-center mb-4">
+                            <img src="{{ item.foto if item.foto else 'https://placehold.co/400x250/e2e8f0/1e293b?text=Sem+Foto' }}" 
+                                 class="img-fluid rounded shadow-sm border" style="max-height: 200px;">
+                        </div>
+
+                        <!-- Dados em Leitura -->
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-0">Nome do Equipamento</label>
+                            <p class="fs-5 fw-bold mb-1">{{ item.nome }}</p>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label class="form-label text-muted small fw-bold mb-0">Patrimônio / Observação</label>
+                            <p class="mb-0">{{ item.patrimonio }} — {{ item.observacao }}</p>
+                        </div>
+
+                        <hr>
+
+                        <!-- Controles Editáveis -->
+                        <div class="row align-items-center">
+                            <div class="col-6">
+                                <label class="form-label fw-bold text-dark mb-1">Quantidade Total</label>
+                                <input type="number" class="form-control fw-bold text-center" name="quantidade" value="{{ item.estoque_total }}" min="0">
+                            </div>
+                            <div class="col-6 text-end mt-4">
+                                <button type="submit" name="acao" value="salvar" class="btn btn-primary fw-bold px-4">Salvar Qtd</button>
+                            </div>
+                        </div>
+
+                    </div>
+                    
+                    <div class="modal-footer bg-light border-0 d-flex justify-content-between">
+                        <!-- Botão de Desabilitar / Habilitar -->
+                        {% if item.status == 'bloqueado' %}
+                            <button type="submit" name="acao" value="habilitar" class="btn btn-outline-success fw-bold">
+                                <i class="bi bi-check-circle"></i> Reabilitar
+                            </button>
+                        {% else %}
+                            <button type="submit" name="acao" value="desabilitar" class="btn btn-outline-secondary fw-bold" onclick="return confirm('Os alunos não poderão mais reservar este item. Confirmar?')">
+                                <i class="bi bi-pause-circle"></i> Desabilitar
+                            </button>
+                        {% endif %}
+
+                        <!-- Botão de Apagar -->
+                        <button type="submit" name="acao" value="apagar" class="btn btn-danger fw-bold" onclick="return confirm('ATENÇÃO: O item será permanentemente apagado do sistema. Deseja continuar?')">
+                            <i class="bi bi-trash3"></i> Apagar
+                        </button>
+                    </div>
+                </form>
+                
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

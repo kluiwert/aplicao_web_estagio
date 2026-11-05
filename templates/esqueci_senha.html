@@ -34,10 +34,43 @@
          ============================================================ -->
     <div class="login-wrapper">
         <div class="card login-card">
-
             <!-- Cabeçalho: brasão + nome da instituição + título + instrução -->
             <div class="text-center mb-4">
-                <img src="{{ url_for('static', filename='logo-ufam.png') }}" alt="Brasão UFAM" width="70" class="mb-2">
+                <!--
+                  LINHA 1: Logos UFAM e FEEC lado a lado.
+                  - src: imagem padrão (carregada inicialmente).
+                  - data-dark / data-light: versões usadas pelo JS ao alternar o tema.
+                  - Os IDs (logoUfam, logoFeec, logoPpgee) são usados pelo script de
+                    troca de tema: NÃO renomear sem atualizar o JS.
+                -->
+                <div class="d-flex justify-content-center align-items-center gap-4 mb-3">
+                    <img id="logoUfam"
+                        src="{{ url_for('static', filename='logo-ufam.svg') }}"
+                        data-dark="{{ url_for('static', filename='logo-ufam-dark.png') }}"
+                        data-light="{{ url_for('static', filename='logo-ufam-light.svg') }}"
+                        alt="Logo UFAM" width="110">
+
+                    <!-- A logo da FEEC usa o mesmo arquivo nos dois temas -->
+                    <img id="logoFeec"
+                        src="{{ url_for('static', filename='logo-feec3.png') }}"
+                        data-dark="{{ url_for('static', filename='logo-feec3.png') }}"
+                        data-light="{{ url_for('static', filename='logo-feec3.png') }}"
+                        alt="Logo FEEC" width="90">
+                </div>
+
+                <!--
+                  LINHA 2: Logo do PPGEE centralizada.
+                  Tema escuro: versão branca. Tema claro: versão colorida.
+                -->
+                <div>
+                    <img id="logoPpgee"
+                        src="{{ url_for('static', filename='ppgee-branca.png') }}"
+                        data-dark="{{ url_for('static', filename='ppgee-branca.png') }}"
+                        data-light="{{ url_for('static', filename='ppgee-colorido.png') }}"
+                        alt="Logo PPGEE" width="120">
+                </div>
+            
+            
     
                 <h3 class="fw-bold text-white mt-3">Recuperação de Senha</h3>
                 <p class="text-muted mb-0 small">Digite seu CPF cadastrado para receber as instruções de recuperação.</p>
@@ -63,63 +96,51 @@
         </div>
     </div>
 
-    <!-- ============================================================
+<!-- ============================================================
          Botão Flutuante de Tema (claro/escuro)
          ============================================================ -->
     <button class="btn-theme-toggle" id="themeToggle" title="Alternar Tema">
         ☀️
     </button>
 
-    <!-- ============================================================
-         Scripts: Máscara de CPF + persistência do Tema Claro/Escuro
-         ============================================================ -->
     <script>
-        // ==========================================
-        // 1. MÁSCARA AUTOMÁTICA DO CPF
-        // Formata a digitação em tempo real para 000.000.000-00
-        // ==========================================
-        const cpfInput = document.getElementById('cpf');
+    const themeToggleBtn = document.getElementById('themeToggle');
+    const body = document.body;
 
-        cpfInput.addEventListener('input', function (e) {
-            let valor = e.target.value;
+    // Função que varre os logos e atualiza as imagens conforme o tema ativo
+    function atualizarLogos() {
+        const isLight = body.classList.contains('light-theme');
+        const logos = document.querySelectorAll('#logoUfam, #logoFeec, #logoPpgee');
 
-            valor = valor.replace(/\D/g, "");           // remove tudo que não é número
-            if (valor.length > 11) valor = valor.slice(0, 11); // limita a 11 dígitos (CPF)
-
-            // Insere os separadores na posição correta
-            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");       // primeiro ponto
-            valor = valor.replace(/(\d{3})(\d)/, "$1.$2");       // segundo ponto
-            valor = valor.replace(/(\d{3})(\d{1,2})$/, "$1-$2"); // traço final
-
-            e.target.value = valor;
-        });
-
-        // ==========================================
-        // 2. LÓGICA DO MODO CLARO / ESCURO
-        // Guarda a preferência no localStorage do navegador,
-        // então ela é lembrada mesmo depois de fechar a página.
-        // ==========================================
-        const themeToggleBtn = document.getElementById('themeToggle');
-        const body = document.body;
-
-        // Ao carregar a página, verifica se o usuário já escolheu o tema claro antes
-        if (localStorage.getItem('theme') === 'light') {
-            body.classList.add('light-theme'); // aplica o tema claro
-            themeToggleBtn.innerHTML = '🌙';   // ícone de lua = "clique para escurecer"
-        }
-
-        // Ao clicar no botão, alterna o tema e salva a nova escolha
-        themeToggleBtn.addEventListener('click', () => {
-            body.classList.toggle('light-theme');
-
-            if (body.classList.contains('light-theme')) {
-                localStorage.setItem('theme', 'light');
-                themeToggleBtn.innerHTML = '🌙';
-            } else {
-                localStorage.setItem('theme', 'dark');
-                themeToggleBtn.innerHTML = '☀️';
+        logos.forEach(logo => {
+            const novaSrc = isLight ? logo.getAttribute('data-light') : logo.getAttribute('data-dark');
+            if (novaSrc) {
+                logo.src = novaSrc;
             }
         });
-    </script>
+    }
+
+    // 1. Ao carregar a página: aplica o tema salvo e atualiza os logos
+    if (localStorage.getItem('theme') === 'light') {
+        body.classList.add('light-theme');
+        themeToggleBtn.innerHTML = '🌙';
+    }
+    atualizarLogos(); // Atualiza a fonte das imagens ao carregar
+
+    // 2. Ao clicar no botão: alterna o tema, salva a escolha e atualiza os logos
+    themeToggleBtn.addEventListener('click', () => {
+        body.classList.toggle('light-theme');
+
+        if (body.classList.contains('light-theme')) {
+            localStorage.setItem('theme', 'light');
+            themeToggleBtn.innerHTML = '🌙';
+        } else {
+            localStorage.setItem('theme', 'dark');
+            themeToggleBtn.innerHTML = '☀️';
+        }
+
+        atualizarLogos(); // Troca as imagens dinamicamente no clique
+    });
+</script>
 </body>
 </html>

@@ -1,29 +1,13 @@
 <!DOCTYPE html>
-<!--
-    ============================================================
-    TELA: Reservas Pendentes (Visão do Administrador) - FEEC
-    ============================================================
-    O QUE ESTA TELA ENTREGA VISUALMENTE:
-    Painel de controlo para a equipa técnica e professores gerirem
-    as solicitações de empréstimo de equipamentos feitas pelos alunos.
-    
-    Estrutura:
-      - Navbar Admin: Identificação visual em modo escuro com badge vermelho.
-      - Cartão de Filtros: Opções rápidas para pesquisar alunos ou filtrar 
-        por data (visual/estético por enquanto).
-      - Tabela de Solicitações: Lista central detalhada contendo:
-        * Dados do Aluno (Nome, Vínculo e Matrícula)
-        * Equipamento solicitado e Código de Património
-        * Período da reserva (Retirada e Devolução)
-        * Botões de Ação rápida (Aprovar em verde / Recusar em vermelho).
-    ============================================================
--->
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Aprovação de Reservas - Admin FEEC</title>
+    
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+
     <style>
         body { background-color: #f4f6f9; }
         .navbar-admin { background-color: #1e293b; }
@@ -32,7 +16,6 @@
 </head>
 <body>
 
-    <!-- Barra de Navegação do Administrador -->
     <nav class="navbar navbar-dark navbar-admin shadow-sm mb-4">
         <div class="container">
             <span class="navbar-brand mb-0 h1 d-flex align-items-center">
@@ -48,7 +31,6 @@
 
     <div class="container">
         
-        <!-- Cabeçalho da Página -->
         <div class="row mb-4">
             <div class="col-12">
                 <h3 class="fw-bold text-dark">Solicitações Pendentes</h3>
@@ -56,10 +38,12 @@
             </div>
         </div>
 
-        <!-- Tabela de Solicitações -->
-        <div class="card border-0 shadow-sm">
+        <!-- Tabela 1: Solicitações de Empréstimo Padrão -->
+        <div class="card border-0 shadow-sm mb-4">
             <div class="card-header bg-white p-3 border-bottom-0">
-                <h6 class="fw-bold text-secondary mb-0">A aguardar análise (2)</h6>
+                <h6 class="fw-bold text-secondary mb-0">
+                    A aguardar análise (<span id="totalPendentes">2</span>)
+                </h6>
             </div>
             <div class="card-body p-0 table-responsive">
                 <table class="table table-hover align-middle mb-0">
@@ -71,8 +55,7 @@
                             <th class="text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <!-- Solicitação 1 -->
+                    <tbody id="tabelaSolicitacoes">
                         <tr>
                             <td class="ps-4">
                                 <strong class="text-dark">João Silva</strong><br>
@@ -88,13 +71,11 @@
                             </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">
-                                    <button class="btn btn-sm btn-outline-danger fw-bold px-3">Recusar</button>
-                                    <button class="btn btn-sm btn-success fw-bold px-3">Aprovar</button>
+                                    <button class="btn btn-sm btn-outline-danger fw-bold px-3 btn-recusar">Recusar</button>
+                                    <button class="btn btn-sm btn-success fw-bold px-3 btn-aprovar">Aprovar</button>
                                 </div>
                             </td>
                         </tr>
-
-                        <!-- Solicitação 2 -->
                         <tr>
                             <td class="ps-4">
                                 <strong class="text-dark">Maria Fernandes</strong><br>
@@ -110,8 +91,8 @@
                             </td>
                             <td class="text-center">
                                 <div class="d-flex justify-content-center gap-2">
-                                    <button class="btn btn-sm btn-outline-danger fw-bold px-3">Recusar</button>
-                                    <button class="btn btn-sm btn-success fw-bold px-3">Aprovar</button>
+                                    <button class="btn btn-sm btn-outline-danger fw-bold px-3 btn-recusar">Recusar</button>
+                                    <button class="btn btn-sm btn-success fw-bold px-3 btn-aprovar">Aprovar</button>
                                 </div>
                             </td>
                         </tr>
@@ -119,10 +100,137 @@
                 </table>
             </div>
             <div class="card-footer bg-light p-3 text-center border-0">
-                <small class="text-muted">Não há mais solicitações pendentes para hoje.</small>
+                <small class="text-muted" id="rodapeMensagem">Analise as solicitações pendentes acima.</small>
+            </div>
+        </div>
+
+        <!-- Tabela 2: Fila de Espera / "Avise-me" -->
+        <div class="card border-0 shadow-sm mb-5">
+            <div class="card-header bg-white p-3 border-bottom-0">
+                <h6 class="fw-bold text-secondary mb-0">
+                    Alunos na Fila de Espera / "Avise-me" (<span id="totalEspera">{{ solicitacoes_aviso | length }}</span>)
+                </h6>
+            </div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Aluno / Matrícula</th>
+                            <th>Equipamento Solicitado</th>
+                            <th>Status</th>
+                            <th class="text-center">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaEspera">
+                        {% for item in solicitacoes_aviso %}
+                        <tr>
+                            <td class="ps-4">
+                                <strong class="text-dark">{{ item.aluno }}</strong><br>
+                                <small class="text-muted">Matrícula: {{ item.matricula }}</small>
+                            </td>
+                            <td>
+                                <strong>{{ item.equipamento }}</strong><br>
+                                <small class="text-secondary">Patrimônio: {{ item.patrimonio }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-warning text-dark">{{ item.status }}</span>
+                            </td>
+                            <td class="text-center">
+                                <!-- Formulário que envia o POST para o app.py registrar a notificação para o aluno -->
+                                <form action="/painel-admin/notificar/{{ item.aluno }}/{{ item.equipamento }}" method="POST" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-success fw-bold px-3">Notificar Disponibilidade</button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr class="linha-vazia-espera">
+                            <td colspan="4" class="text-center py-4 text-muted">
+                                Nenhum aluno cadastrado na lista de espera no momento.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- POP-UP / MODAL DE NOTIFICAÇÃO DE SUCESSO -->
+    <div class="modal fade" id="modalSucesso" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-sm">
+            <div class="modal-content text-center p-3 border-0 shadow">
+                <div class="modal-body">
+                    <div id="iconeModalStatus" class="text-success mb-2" style="font-size: 3.5rem; line-height: 1;">✓</div>
+                    <h5 class="fw-bold text-dark" id="tituloModalSucesso">Concluído!</h5>
+                    <p class="text-muted small mb-0" id="mensagemSucesso">Operação realizada com sucesso.</p>
+                </div>
+                <div class="modal-footer justify-content-center border-0 p-0 mt-3">
+                    <button type="button" class="btn btn-success btn-sm px-4 fw-bold" data-bs-dismiss="modal">OK</button>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const tabelaSolicitacoes = document.getElementById('tabelaSolicitacoes');
+            const totalPendentes = document.getElementById('totalPendentes');
+            const rodapeMensagem = document.getElementById('rodapeMensagem');
+            
+            const modalSucessoEl = document.getElementById('modalSucesso');
+            const modalSucesso = new bootstrap.Modal(modalSucessoEl);
+            const mensagemSucessoText = document.getElementById('mensagemSucesso');
+            const tituloModalSucesso = document.getElementById('tituloModalSucesso');
+            const iconeModalStatus = document.getElementById('iconeModalStatus');
+
+            function atualizarTabelaPendentes() {
+                const linhas = tabelaSolicitacoes.querySelectorAll('tr:not(.linha-vazia)');
+                totalPendentes.textContent = linhas.length;
+
+                if (linhas.length === 0) {
+                    tabelaSolicitacoes.innerHTML = `
+                        <tr class="linha-vazia">
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="bi bi-check-circle-fill text-success fs-1 d-block mb-2"></i>
+                                <strong>Nenhuma solicitação pendente no momento!</strong>
+                            </td>
+                        </tr>
+                    `;
+                    rodapeMensagem.textContent = 'Todas as solicitações de hoje foram processadas.';
+                }
+            }
+
+            tabelaSolicitacoes.addEventListener('click', function (e) {
+                const btn = e.target;
+                const linha = btn.closest('tr');
+
+                if (!linha || linha.classList.contains('linha-vazia')) return;
+
+                const nomeAluno = linha.querySelector('td strong').textContent.trim();
+
+                if (btn.classList.contains('btn-aprovar')) {
+                    linha.remove();
+                    atualizarTabelaPendentes();
+                    iconeModalStatus.className = 'text-success mb-2';
+                    iconeModalStatus.textContent = '✓';
+                    tituloModalSucesso.textContent = 'Reserva Aprovada!';
+                    mensagemSucessoText.textContent = `A solicitação de ${nomeAluno} foi aprovada com sucesso.`;
+                    modalSucesso.show();
+                }
+
+                if (btn.classList.contains('btn-recusar')) {
+                    linha.remove();
+                    atualizarTabelaPendentes();
+                    iconeModalStatus.className = 'text-danger mb-2';
+                    iconeModalStatus.textContent = '✕';
+                    tituloModalSucesso.textContent = 'Reserva Recusada!';
+                    mensagemSucessoText.textContent = `A solicitação de ${nomeAluno} foi recusada.`;
+                    modalSucesso.show();
+                }
+            });
+        });
+    </script>
 </body>
 </html>

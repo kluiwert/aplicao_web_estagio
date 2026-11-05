@@ -47,7 +47,7 @@
         <div class="container">
             <span class="navbar-brand mb-0 h1 d-flex align-items-center">
                 <span class="badge bg-danger me-2">ADMIN</span>
-                Laboratório de Controle e Energia
+                Laboratório de Energia e Controle 
             </span>
             <div class="d-flex">
                 <!-- "Olá, Admin" é texto fixo por enquanto;
@@ -73,18 +73,7 @@
              ============================================================ -->
         <div class="row">
 
-            <!-- ---------- Módulo 1: Equipamentos ---------- -->
-            <div class="col-md-4 mb-3">
-                <div class="card border-0 shadow-sm h-100 card-menu">
-                    <div class="card-body text-center p-4">
-                        <h1 class="display-4 mb-3">🛠️</h1>
-                        <h5 class="fw-bold">Gerenciar Equipamentos</h5>
-                        <p class="text-muted small">Adicionar, editar ou remover itens do inventário do laboratório.</p>
-                        <!-- Link funcional: leva para a tela de cadastro de materiais -->
-                        <a href="/painel-admin/cadastro-materiais" class="btn btn-primary w-100 mt-2">Acessar Inventário</a>
-                    </div>
-                </div>
-            </div>
+           
 
             <!-- ---------- Módulo 2: Aprovar Reservas ----------
                  CORREÇÃO: era um <button> sem nenhuma ação (sem onclick,
@@ -115,8 +104,35 @@
                     </div>
                 </div>
             </div>
+
+
+            <div class="col-md-4 mb-4">
+                <div class="card border-0 shadow-sm h-100 text-center">
+                    <div class="card-body p-4 d-flex flex-column">
+                        
+                        <!-- Ícone grande no topo (combinando com o estilo dos outros cards) -->
+                        <div class="mb-3">
+                            <span style="font-size: 4rem; line-height: 1;">📦</span>
+                        </div>
+                        
+                        <h5 class="fw-bold text-dark mb-2">Gerenciar Estoque</h5>
+                        
+                        <!-- flex-grow-1 garante que o texto ocupe o espaço correto e empurre o botão para baixo -->
+                        <p class="text-muted small mb-4 flex-grow-1">Visualize todos os itens, edite quantidades, desabilite ou apague equipamentos do sistema.</p>
+                        
+                        <!-- Botão sólido (neste caso, verde/success para combinar com o visual de preenchimento dos outros) -->
+                        <a href="/painel-admin/estoque" class="btn btn-success w-100 fw-bold border-0" style="padding: 10px 0; border-radius: 6px;">
+                            Acessar Estoque
+                        </a>
+                        
+                    </div>
+                </div>
+            </div>
+             
         </div>
     </div>
+
+    
 
 </body>
 </html>
